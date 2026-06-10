@@ -1,2 +1,3 @@
-# pozu-transcode
-Video transcoding the Pozu project.
+# Pozu (Transcoding)
+
+Video transcoding for the Pozu project.
