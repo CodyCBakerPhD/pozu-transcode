@@ -1,4 +1,4 @@
-# pozu-transcode
+# Pozu (Transcoding)
 
 Transcode **local** videos into the canonical, aspect-ratio–bucketed,
 fast-seek H.264 space used by [pozu](https://github.com/CodyCBakerPhD), a
