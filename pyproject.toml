@@ -19,7 +19,7 @@ dependencies = [
 test = ["pytest"]
 
 [project.scripts]
-pozu = "pozu_transcode.cli:pozu"
+pozu = "pozu_transcode._cli:pozu"
 
 [tool.hatch.build.targets.wheel]
 packages = ["src/pozu_transcode"]

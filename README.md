@@ -140,8 +140,9 @@ pozu transcode batch clips.txt ./out \
 
 ## Library API
 
-The core (`pozu_transcode.core`) is framework-agnostic — paths in, dataclasses
-out — and is shared by every CLI command:
+The core is framework-agnostic — paths in, dataclasses out — and is shared by
+every CLI command. Import everything from the top-level `pozu_transcode`
+package (the submodules are private):
 
 ```python
 from pozu_transcode import (

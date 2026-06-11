@@ -1,8 +1,9 @@
 """rich-click CLI for pozu-transcode.
 
-Three commands (``single``, ``batch``, ``survey``) share the same set of
-encode/bucket options. All real work lives in :mod:`pozu_transcode.core`; this
-module only parses options and prints.
+The ``pozu`` group nests ``transcode video``, ``transcode batch`` and
+``survey``, all sharing the same set of encode/bucket options. All real work
+lives in :mod:`pozu_transcode._core`; this module only parses options and
+prints.
 """
 
 from __future__ import annotations
@@ -14,7 +15,7 @@ import rich_click as click
 from rich.console import Console
 
 from . import __version__
-from .config import (
+from ._config import (
     DEFAULT_ALLOW_UPSCALE,
     DEFAULT_BUCKETS,
     DEFAULT_CRF,
@@ -24,7 +25,7 @@ from .config import (
     Bucket,
     TranscodeConfig,
 )
-from . import core
+from . import _core
 
 click.rich_click.USE_RICH_MARKUP = True
 click.rich_click.SHOW_ARGUMENTS = True
@@ -109,7 +110,7 @@ def transcode() -> None:
 def video(input, output, crf, preset, gop_seconds, fps, allow_upscale, buckets):
     """Transcode a single INPUT video file to OUTPUT."""
     cfg = _config_from(crf, preset, gop_seconds, fps, allow_upscale, buckets)
-    record = core.transcode(input, output, cfg)
+    record = _core.transcode(input, output, cfg)
     console.print(
         f"[green]✓[/green] {record.src_path} → {record.out_path} "
         f"\\[{record.bucket} {record.canvas_w}x{record.canvas_h}, "
@@ -129,7 +130,7 @@ def batch(list_file, output_dir, crf, preset, gop_seconds, fps, allow_upscale, b
     list file's own directory.
     """
     cfg = _config_from(crf, preset, gop_seconds, fps, allow_upscale, buckets)
-    sources = core.read_path_list(list_file)
+    sources = _core.read_path_list(list_file)
     if not sources:
         console.print(f"No video paths found in {list_file}.")
         return
@@ -140,8 +141,8 @@ def batch(list_file, output_dir, crf, preset, gop_seconds, fps, allow_upscale, b
             f"\\[{record.bucket} {record.canvas_w}x{record.canvas_h}]"
         )
 
-    records = core.transcode_batch(sources, output_dir, cfg, on_progress=progress)
-    manifest_path = core.write_manifest(records, Path(output_dir) / "manifest.json")
+    records = _core.transcode_batch(sources, output_dir, cfg, on_progress=progress)
+    manifest_path = _core.write_manifest(records, Path(output_dir) / "manifest.json")
     console.print(
         f"\nWrote [cyan]{manifest_path}[/cyan] with {len(records)} entries."
     )
@@ -153,7 +154,7 @@ def batch(list_file, output_dir, crf, preset, gop_seconds, fps, allow_upscale, b
 def survey(input_dir, crf, preset, gop_seconds, fps, allow_upscale, buckets):
     """Print a resolution + aspect-ratio histogram (no transcoding)."""
     cfg = _config_from(crf, preset, gop_seconds, fps, allow_upscale, buckets)
-    entries = core.survey(input_dir, cfg)
+    entries = _core.survey(input_dir, cfg)
     if not entries:
         console.print("No videos found.")
         return
@@ -163,7 +164,7 @@ def survey(input_dir, crf, preset, gop_seconds, fps, allow_upscale, buckets):
             f"{e.path}: {e.width}x{e.height} AR={e.aspect_ratio:.2f} "
             f"{e.codec} {e.fps_r:.2f}fps → [cyan]{e.bucket}[/cyan]{vfr}"
         )
-    hist = core.aspect_histogram(entries)
+    hist = _core.aspect_histogram(entries)
     console.print("\n[bold]AR histogram:[/bold]")
     for ar, count in hist.items():
         console.print(f"  {ar:>5.2f}: {'#' * count} ({count})")

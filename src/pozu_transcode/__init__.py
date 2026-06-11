@@ -1,15 +1,16 @@
 """pozu-transcode: transcode local videos into the canonical pozu space.
 
-The public API lives in :mod:`pozu_transcode.core` (framework-agnostic) and is
-configured via :mod:`pozu_transcode.config`.
+The implementation lives in private submodules (:mod:`pozu_transcode._core`,
+:mod:`pozu_transcode._config`, :mod:`pozu_transcode._cli`); the public API is
+everything re-exported here.
 """
 
-from .config import (
+from ._config import (
     DEFAULT_BUCKETS,
     Bucket,
     TranscodeConfig,
 )
-from .core import (
+from ._core import (
     EncodePlan,
     Letterbox,
     ProbeResult,

@@ -6,9 +6,10 @@ import math
 
 import pytest
 
-from pozu_transcode.config import DEFAULT_BUCKETS, Bucket, TranscodeConfig
-from pozu_transcode.core import (
+from pozu_transcode import (
+    Bucket,
     ProbeResult,
+    TranscodeConfig,
     build_ffmpeg_command,
     compute_letterbox,
     even,

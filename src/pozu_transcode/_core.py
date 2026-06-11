@@ -20,7 +20,7 @@ from dataclasses import asdict, dataclass
 from pathlib import Path
 from typing import Dict, Iterable, Iterator, List, Optional, Sequence, Union
 
-from .config import DEFAULT_BUCKETS, VIDEO_EXTENSIONS, Bucket, TranscodeConfig
+from ._config import DEFAULT_BUCKETS, VIDEO_EXTENSIONS, Bucket, TranscodeConfig
 
 PathLike = Union[str, "os.PathLike[str]"]
 
