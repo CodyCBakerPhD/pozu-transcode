@@ -89,20 +89,25 @@ def _config_from(crf, preset, gop_seconds, fps, allow_upscale, buckets) -> Trans
 
 
 @click.group(context_settings={"help_option_names": ["-h", "--help"]})
-@click.version_option(__version__, prog_name="pozu-transcode")
-def cli() -> None:
-    """Transcode local videos into the canonical **pozu** space.
+@click.version_option(__version__, prog_name="pozu")
+def pozu() -> None:
+    """**pozu** — tooling for the pozu pose labeler.
 
     Requires `ffmpeg` and `ffprobe` on your PATH.
     """
 
 
-@cli.command()
+@pozu.group()
+def transcode() -> None:
+    """Transcode local videos into the canonical **pozu** space."""
+
+
+@transcode.command()
 @click.argument("input", type=click.Path(exists=True, dir_okay=False, path_type=Path))
 @click.argument("output", type=click.Path(dir_okay=False, path_type=Path))
 @shared_options
-def single(input, output, crf, preset, gop_seconds, fps, allow_upscale, buckets):
-    """Transcode a single INPUT file to OUTPUT."""
+def video(input, output, crf, preset, gop_seconds, fps, allow_upscale, buckets):
+    """Transcode a single INPUT video file to OUTPUT."""
     cfg = _config_from(crf, preset, gop_seconds, fps, allow_upscale, buckets)
     record = core.transcode(input, output, cfg)
     console.print(
@@ -112,13 +117,22 @@ def single(input, output, crf, preset, gop_seconds, fps, allow_upscale, buckets)
     )
 
 
-@cli.command()
-@click.argument("input_dir", type=click.Path(exists=True, file_okay=False, path_type=Path))
+@transcode.command()
+@click.argument("list_file", type=click.Path(exists=True, dir_okay=False, path_type=Path))
 @click.argument("output_dir", type=click.Path(file_okay=False, path_type=Path))
 @shared_options
-def batch(input_dir, output_dir, crf, preset, gop_seconds, fps, allow_upscale, buckets):
-    """Transcode every video under INPUT_DIR into OUTPUT_DIR + manifest.json."""
+def batch(list_file, output_dir, crf, preset, gop_seconds, fps, allow_upscale, buckets):
+    """Transcode the videos listed in LIST_FILE into OUTPUT_DIR + manifest.json.
+
+    LIST_FILE is a text file with one video path per line. Blank lines and
+    lines starting with `#` are ignored; relative paths resolve against the
+    list file's own directory.
+    """
     cfg = _config_from(crf, preset, gop_seconds, fps, allow_upscale, buckets)
+    sources = core.read_path_list(list_file)
+    if not sources:
+        console.print(f"No video paths found in {list_file}.")
+        return
 
     def progress(i, total, record):
         console.print(
@@ -126,14 +140,14 @@ def batch(input_dir, output_dir, crf, preset, gop_seconds, fps, allow_upscale, b
             f"\\[{record.bucket} {record.canvas_w}x{record.canvas_h}]"
         )
 
-    records = core.transcode_batch(input_dir, output_dir, cfg, on_progress=progress)
+    records = core.transcode_batch(sources, output_dir, cfg, on_progress=progress)
     manifest_path = core.write_manifest(records, Path(output_dir) / "manifest.json")
     console.print(
         f"\nWrote [cyan]{manifest_path}[/cyan] with {len(records)} entries."
     )
 
 
-@cli.command()
+@pozu.command()
 @click.argument("input_dir", type=click.Path(exists=True, file_okay=False, path_type=Path))
 @shared_options
 def survey(input_dir, crf, preset, gop_seconds, fps, allow_upscale, buckets):
@@ -157,4 +171,4 @@ def survey(input_dir, crf, preset, gop_seconds, fps, allow_upscale, buckets):
 
 
 if __name__ == "__main__":
-    cli()
+    pozu()

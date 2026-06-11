@@ -56,17 +56,30 @@ ffmpeg -version
 
 ## Usage
 
-Three commands share the same encode/bucket options:
+`pozu` is the top-level command. Transcoding lives under the `transcode`
+group; `survey` sits at the top level. They all share the same encode/bucket
+options.
 
 ```bash
 # one file
-pozu-transcode single  input.mp4 output.mp4
+pozu transcode video  input.mp4 output.mp4
 
-# a directory -> outputs + manifest.json
-pozu-transcode batch   ./raw_videos ./transcoded
+# a list of videos -> outputs + manifest.json
+pozu transcode batch  clips.txt ./transcoded
 
 # resolution + aspect-ratio histogram, no transcoding
-pozu-transcode survey  ./raw_videos
+pozu survey  ./raw_videos
+```
+
+`batch` reads `clips.txt`, a text file with **one video path per line**. Blank
+lines and lines starting with `#` are ignored, and relative paths resolve
+against the list file's own directory:
+
+```text
+# clips.txt
+/data/raw/clip01.mov
+clip02.mp4
+subdir/clip03.mkv
 ```
 
 ### Options
@@ -83,7 +96,7 @@ pozu-transcode survey  ./raw_videos
 Example with custom buckets and a higher-quality CRF:
 
 ```bash
-pozu-transcode batch ./raw ./out \
+pozu transcode batch clips.txt ./out \
   --crf 18 --fps 25 \
   --bucket sq:768x768 --bucket 16x9:1024x576
 ```
@@ -133,7 +146,7 @@ out — and is shared by every CLI command:
 ```python
 from pozu_transcode import (
     TranscodeConfig, probe, plan_encode, build_ffmpeg_command,
-    transcode, transcode_batch, survey, write_manifest,
+    transcode, transcode_batch, read_path_list, write_manifest,
 )
 
 cfg = TranscodeConfig(crf=18, fps=30)
@@ -147,8 +160,9 @@ print(build_ffmpeg_command(plan))   # the exact ffmpeg argv
 # encode one file
 record = transcode("clip.mov", "clip.mp4", cfg)
 
-# encode a directory and write a manifest
-records = transcode_batch("raw/", "out/", cfg)
+# encode an explicit list of videos and write a manifest
+sources = read_path_list("clips.txt")          # or any iterable of paths
+records = transcode_batch(sources, "out/", cfg)
 write_manifest(records, "out/manifest.json")
 ```
 
@@ -160,5 +174,5 @@ pytest
 ```
 
 The unit tests cover geometry (`even`, `pick_bucket`, `compute_letterbox`),
-planning (`plan_encode`), and ffmpeg command construction — and run **without
-ffmpeg installed**.
+planning (`plan_encode`), ffmpeg command construction, and path-list parsing
+(`read_path_list`) — and run **without ffmpeg installed**.

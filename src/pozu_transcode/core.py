@@ -18,7 +18,7 @@ import os
 import subprocess
 from dataclasses import asdict, dataclass
 from pathlib import Path
-from typing import Dict, Iterator, List, Optional, Sequence, Union
+from typing import Dict, Iterable, Iterator, List, Optional, Sequence, Union
 
 from .config import DEFAULT_BUCKETS, VIDEO_EXTENSIONS, Bucket, TranscodeConfig
 
@@ -257,13 +257,31 @@ def iter_videos(input_dir: PathLike) -> Iterator[Path]:
             yield path
 
 
+def read_path_list(list_file: PathLike) -> List[Path]:
+    """Read a text file of video paths (one per line).
+
+    Blank lines and lines starting with ``#`` are ignored. Relative paths are
+    resolved against the list file's own directory, so a list is portable.
+    """
+    path = Path(list_file)
+    base = path.parent
+    sources: List[Path] = []
+    for line in path.read_text().splitlines():
+        line = line.strip()
+        if not line or line.startswith("#"):
+            continue
+        p = Path(line)
+        sources.append(p if p.is_absolute() else base / p)
+    return sources
+
+
 def transcode_batch(
-    input_dir: PathLike,
+    sources: Iterable[PathLike],
     output_dir: PathLike,
     config: Optional[TranscodeConfig] = None,
     on_progress=None,
 ) -> List[TranscodeRecord]:
-    """Transcode every video under ``input_dir`` into ``output_dir`` (flat .mp4).
+    """Transcode each video in ``sources`` into ``output_dir`` (flat .mp4).
 
     ``on_progress(index, total, record)`` is called after each output if given.
     Returns the list of records (also write it with :func:`write_manifest`).
@@ -272,7 +290,7 @@ def transcode_batch(
     out_root = Path(output_dir)
     out_root.mkdir(parents=True, exist_ok=True)
 
-    sources = list(iter_videos(input_dir))
+    sources = [Path(s) for s in sources]
     records: List[TranscodeRecord] = []
     for i, src in enumerate(sources):
         out_path = out_root / (src.stem + ".mp4")

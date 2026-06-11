@@ -14,6 +14,7 @@ from pozu_transcode.core import (
     even,
     pick_bucket,
     plan_encode,
+    read_path_list,
 )
 
 
@@ -157,3 +158,21 @@ def test_build_ffmpeg_command_custom_bucket():
     assert plan.bucket == "portrait"
     cmd = build_ffmpeg_command(plan)
     assert f"pad=540:960:" in " ".join(cmd)
+
+
+# ── read_path_list() ─────────────────────────────────────────────────────────
+def test_read_path_list_skips_blanks_and_comments(tmp_path):
+    (tmp_path / "a.mp4").touch()
+    (tmp_path / "b.mp4").touch()
+    abs_path = tmp_path / "b.mp4"
+    list_file = tmp_path / "clips.txt"
+    list_file.write_text(
+        "# a comment\n"
+        "a.mp4\n"
+        "\n"
+        "   \n"
+        f"{abs_path}\n"
+    )
+    paths = read_path_list(list_file)
+    # relative paths resolve against the list file's directory; absolute stay put
+    assert paths == [tmp_path / "a.mp4", abs_path]
