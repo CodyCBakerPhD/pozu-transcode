@@ -130,10 +130,6 @@ def batch(list_file, output_dir, crf, preset, gop_seconds, fps, allow_upscale, b
     list file's own directory.
     """
     cfg = _config_from(crf, preset, gop_seconds, fps, allow_upscale, buckets)
-    sources = _core.read_path_list(list_file)
-    if not sources:
-        console.print(f"No video paths found in {list_file}.")
-        return
 
     def progress(i, total, record):
         console.print(
@@ -141,11 +137,13 @@ def batch(list_file, output_dir, crf, preset, gop_seconds, fps, allow_upscale, b
             f"\\[{record.bucket} {record.canvas_w}x{record.canvas_h}]"
         )
 
-    records = _core.transcode_batch(sources, output_dir, cfg, on_progress=progress)
-    manifest_path = _core.write_manifest(records, Path(output_dir) / "manifest.json")
+    records = _core.transcode_batch(list_file, output_dir, cfg, on_progress=progress)
+    manifest_path = Path(output_dir) / _core.MANIFEST_NAME
     console.print(
         f"\nWrote [cyan]{manifest_path}[/cyan] with {len(records)} entries."
     )
+    if not records:
+        console.print(f"[yellow]Note:[/yellow] no video paths found in {list_file}.")
 
 
 @pozu.command()
@@ -164,7 +162,7 @@ def survey(input_dir, crf, preset, gop_seconds, fps, allow_upscale, buckets):
             f"{e.path}: {e.width}x{e.height} AR={e.aspect_ratio:.2f} "
             f"{e.codec} {e.fps_r:.2f}fps → [cyan]{e.bucket}[/cyan]{vfr}"
         )
-    hist = _core.aspect_histogram(entries)
+    hist = _core._aspect_histogram(entries)
     console.print("\n[bold]AR histogram:[/bold]")
     for ar, count in hist.items():
         console.print(f"  {ar:>5.2f}: {'#' * count} ({count})")

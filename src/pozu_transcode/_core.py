@@ -4,6 +4,11 @@ This module is shared by every CLI command. It never imports click, never
 prints, and never touches S3 — it operates on local files and shells out to the
 external ``ffmpeg`` / ``ffprobe`` binaries (which must be on ``PATH``).
 
+The public surface mirrors the CLI commands: :func:`transcode` (``transcode
+video``), :func:`transcode_batch` (``transcode batch``) and :func:`survey`
+(``survey``). Everything else here is an intermediate helper (``_``-prefixed)
+and is not part of the supported API.
+
 Canonical space (see README): H.264 High / yuv420p / +faststart, constant
 frame rate, ~1s closed GOP for fast random-frame seeks, aspect-ratio bucketing
 with uniform-scale + letterbox pad (never stretch, never crop).
@@ -18,11 +23,13 @@ import os
 import subprocess
 from dataclasses import asdict, dataclass
 from pathlib import Path
-from typing import Dict, Iterable, Iterator, List, Optional, Sequence, Union
+from typing import Dict, Iterator, List, Optional, Sequence, Union
 
 from ._config import DEFAULT_BUCKETS, VIDEO_EXTENSIONS, Bucket, TranscodeConfig
 
 PathLike = Union[str, "os.PathLike[str]"]
+
+MANIFEST_NAME = "manifest.json"
 
 
 # ── result dataclasses ───────────────────────────────────────────────────────
@@ -98,18 +105,32 @@ class TranscodeRecord:
     fps: int
 
 
-# ── geometry helpers ─────────────────────────────────────────────────────────
-def even(x: float) -> int:
+@dataclass
+class SurveyEntry:
+    """One source video's geometry + assigned bucket (no transcoding)."""
+
+    path: str
+    width: int
+    height: int
+    aspect_ratio: float
+    codec: str
+    fps_r: float
+    is_vfr: bool
+    bucket: str
+
+
+# ── geometry helpers (private) ───────────────────────────────────────────────
+def _even(x: float) -> int:
     """Round to the nearest even integer (>= 2). yuv420p requires even dims."""
     return max(2, int(round(x / 2) * 2))
 
 
-def pick_bucket(aspect_ratio: float, buckets: Sequence[Bucket] = DEFAULT_BUCKETS) -> Bucket:
+def _pick_bucket(aspect_ratio: float, buckets: Sequence[Bucket] = DEFAULT_BUCKETS) -> Bucket:
     """Assign to the nearest bucket in log-AR space (minimizes letterbox area)."""
     return min(buckets, key=lambda b: abs(math.log(aspect_ratio / b.aspect_ratio)))
 
 
-def compute_letterbox(
+def _compute_letterbox(
     src_w: int,
     src_h: int,
     canvas_w: int,
@@ -124,12 +145,12 @@ def compute_letterbox(
     scale = min(canvas_w / src_w, canvas_h / src_h)
     if not allow_upscale:
         scale = min(scale, 1.0)
-    aw, ah = even(src_w * scale), even(src_h * scale)
+    aw, ah = _even(src_w * scale), _even(src_h * scale)
     return Letterbox(aw, ah, (canvas_w - aw) // 2, (canvas_h - ah) // 2)
 
 
-# ── external tools ───────────────────────────────────────────────────────────
-def probe(path: PathLike) -> ProbeResult:
+# ── external tools (private) ─────────────────────────────────────────────────
+def _probe(path: PathLike) -> ProbeResult:
     """Run ffprobe on ``path`` and return its first video stream's geometry."""
     out = subprocess.run(
         [
@@ -158,8 +179,8 @@ def probe(path: PathLike) -> ProbeResult:
     )
 
 
-# ── planning ─────────────────────────────────────────────────────────────────
-def plan_encode(
+# ── planning (private) ───────────────────────────────────────────────────────
+def _plan_encode(
     src_path: PathLike,
     out_path: PathLike,
     probe_result: ProbeResult,
@@ -167,8 +188,8 @@ def plan_encode(
 ) -> EncodePlan:
     """Resolve a probe + config into a concrete :class:`EncodePlan`."""
     config = config or TranscodeConfig()
-    bucket = pick_bucket(probe_result.aspect_ratio, config.buckets)
-    box = compute_letterbox(
+    bucket = _pick_bucket(probe_result.aspect_ratio, config.buckets)
+    box = _compute_letterbox(
         probe_result.width, probe_result.height,
         bucket.width, bucket.height, config.allow_upscale,
     )
@@ -195,7 +216,7 @@ def plan_encode(
     )
 
 
-def build_ffmpeg_command(plan: EncodePlan) -> List[str]:
+def _build_ffmpeg_command(plan: EncodePlan) -> List[str]:
     """Build the ffmpeg argv for ``plan``. Pure: no side effects."""
     vf = (
         f"scale={plan.active_w}:{plan.active_h}:flags=lanczos,"
@@ -215,21 +236,67 @@ def build_ffmpeg_command(plan: EncodePlan) -> List[str]:
     ]
 
 
-# ── transcoding ──────────────────────────────────────────────────────────────
+# ── input discovery (private) ────────────────────────────────────────────────
+def _iter_videos(input_dir: PathLike) -> Iterator[Path]:
+    """Yield video files under ``input_dir`` (recursive), sorted, by extension."""
+    root = Path(input_dir)
+    for path in sorted(root.rglob("*")):
+        if path.is_file() and path.suffix.lower() in VIDEO_EXTENSIONS:
+            yield path
+
+
+def _read_path_list(list_file: PathLike) -> List[Path]:
+    """Read a text file of video paths (one per line).
+
+    Blank lines and lines starting with ``#`` are ignored. Relative paths are
+    resolved against the list file's own directory, so a list is portable.
+    """
+    path = Path(list_file)
+    base = path.parent
+    sources: List[Path] = []
+    for line in path.read_text().splitlines():
+        line = line.strip()
+        if not line or line.startswith("#"):
+            continue
+        p = Path(line)
+        sources.append(p if p.is_absolute() else base / p)
+    return sources
+
+
+def _aspect_histogram(entries: Sequence[SurveyEntry], precision: int = 2) -> Dict[float, int]:
+    """Bucket survey entries into a rounded-AR -> count histogram."""
+    hist: "collections.Counter[float]" = collections.Counter()
+    for e in entries:
+        hist[round(e.aspect_ratio, precision)] += 1
+    return dict(sorted(hist.items()))
+
+
+def _write_manifest(records: Sequence[TranscodeRecord], out_path: PathLike) -> Path:
+    """Write ``records`` as a JSON array to ``out_path``. Returns the path."""
+    path = Path(out_path)
+    path.parent.mkdir(parents=True, exist_ok=True)
+    path.write_text(json.dumps([asdict(r) for r in records], indent=2))
+    return path
+
+
+# ── public operations (mirror the CLI commands) ──────────────────────────────
 def transcode(
     src_path: PathLike,
     out_path: PathLike,
     config: Optional[TranscodeConfig] = None,
 ) -> TranscodeRecord:
-    """Probe, plan, encode one file, then re-probe the output for frame_count."""
+    """Transcode one video file (mirrors ``pozu transcode video``).
+
+    Probe, plan, encode, then re-probe the output for ``frame_count``.
+    """
     config = config or TranscodeConfig()
-    src_probe = probe(src_path)
-    plan = plan_encode(src_path, out_path, src_probe, config)
+    src_probe = _probe(src_path)
+    plan = _plan_encode(src_path, out_path, src_probe, config)
 
     Path(out_path).parent.mkdir(parents=True, exist_ok=True)
-    subprocess.run(build_ffmpeg_command(plan), check=True)
+    subprocess.run(_build_ffmpeg_command(plan), check=True)
 
-    out_probe = probe(out_path)
+    out_probe = _probe(out_path)
     frame_count = round(out_probe.duration * plan.fps)
     return TranscodeRecord(
         video_id=Path(out_path).name,
@@ -249,48 +316,27 @@ def transcode(
     )
 
 
-def iter_videos(input_dir: PathLike) -> Iterator[Path]:
-    """Yield video files under ``input_dir`` (recursive), sorted, by extension."""
-    root = Path(input_dir)
-    for path in sorted(root.rglob("*")):
-        if path.is_file() and path.suffix.lower() in VIDEO_EXTENSIONS:
-            yield path
-
-
-def read_path_list(list_file: PathLike) -> List[Path]:
-    """Read a text file of video paths (one per line).
-
-    Blank lines and lines starting with ``#`` are ignored. Relative paths are
-    resolved against the list file's own directory, so a list is portable.
-    """
-    path = Path(list_file)
-    base = path.parent
-    sources: List[Path] = []
-    for line in path.read_text().splitlines():
-        line = line.strip()
-        if not line or line.startswith("#"):
-            continue
-        p = Path(line)
-        sources.append(p if p.is_absolute() else base / p)
-    return sources
-
-
 def transcode_batch(
-    sources: Iterable[PathLike],
+    list_file: PathLike,
     output_dir: PathLike,
     config: Optional[TranscodeConfig] = None,
     on_progress=None,
 ) -> List[TranscodeRecord]:
-    """Transcode each video in ``sources`` into ``output_dir`` (flat .mp4).
+    """Transcode the videos listed in ``list_file`` (mirrors ``pozu transcode batch``).
+
+    ``list_file`` is a text file with one video path per line (blank lines and
+    lines starting with ``#`` are ignored; relative paths resolve against the
+    list file's own directory). Outputs are written flat as ``<stem>.mp4`` into
+    ``output_dir``, and a ``manifest.json`` is written there too.
 
     ``on_progress(index, total, record)`` is called after each output if given.
-    Returns the list of records (also write it with :func:`write_manifest`).
+    Returns the list of records.
     """
     config = config or TranscodeConfig()
     out_root = Path(output_dir)
     out_root.mkdir(parents=True, exist_ok=True)
 
-    sources = [Path(s) for s in sources]
+    sources = _read_path_list(list_file)
     records: List[TranscodeRecord] = []
     for i, src in enumerate(sources):
         out_path = out_root / (src.stem + ".mp4")
@@ -298,40 +344,24 @@ def transcode_batch(
         records.append(record)
         if on_progress is not None:
             on_progress(i + 1, len(sources), record)
+
+    _write_manifest(records, out_root / MANIFEST_NAME)
     return records
-
-
-# ── survey ───────────────────────────────────────────────────────────────────
-@dataclass
-class SurveyEntry:
-    path: str
-    width: int
-    height: int
-    aspect_ratio: float
-    codec: str
-    fps_r: float
-    is_vfr: bool
-    bucket: str
-
-
-def aspect_histogram(entries: Sequence[SurveyEntry], precision: int = 2) -> Dict[float, int]:
-    """Bucket survey entries into a rounded-AR -> count histogram."""
-    hist: "collections.Counter[float]" = collections.Counter()
-    for e in entries:
-        hist[round(e.aspect_ratio, precision)] += 1
-    return dict(sorted(hist.items()))
 
 
 def survey(
     input_dir: PathLike,
     config: Optional[TranscodeConfig] = None,
 ) -> List[SurveyEntry]:
-    """Probe every video under ``input_dir`` (no transcoding) for AR analysis."""
+    """Probe every video under ``input_dir`` (mirrors ``pozu survey``).
+
+    No transcoding — just resolution + aspect-ratio analysis.
+    """
     config = config or TranscodeConfig()
     entries: List[SurveyEntry] = []
-    for src in iter_videos(input_dir):
-        m = probe(src)
-        bucket = pick_bucket(m.aspect_ratio, config.buckets)
+    for src in _iter_videos(input_dir):
+        m = _probe(src)
+        bucket = _pick_bucket(m.aspect_ratio, config.buckets)
         entries.append(
             SurveyEntry(
                 path=str(src),
@@ -345,12 +375,3 @@ def survey(
             )
         )
     return entries
-
-
-# ── manifest ─────────────────────────────────────────────────────────────────
-def write_manifest(records: Sequence[TranscodeRecord], out_path: PathLike) -> Path:
-    """Write ``records`` as a JSON array to ``out_path``. Returns the path."""
-    path = Path(out_path)
-    path.parent.mkdir(parents=True, exist_ok=True)
-    path.write_text(json.dumps([asdict(r) for r in records], indent=2))
-    return path

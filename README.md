@@ -140,32 +140,35 @@ pozu transcode batch clips.txt ./out \
 
 ## Library API
 
-The core is framework-agnostic — paths in, dataclasses out — and is shared by
-every CLI command. Import everything from the top-level `pozu_transcode`
-package (the submodules are private):
+The public API is intentionally small and mirrors the three CLI commands. Import
+from the top-level `pozu_transcode` package (the submodules are private):
+
+| function | mirrors |
+| --- | --- |
+| `transcode(input, output, config=None)` | `pozu transcode video` |
+| `transcode_batch(list_file, output_dir, config=None)` | `pozu transcode batch` |
+| `survey(input_dir, config=None)` | `pozu survey` |
 
 ```python
-from pozu_transcode import (
-    TranscodeConfig, probe, plan_encode, build_ffmpeg_command,
-    transcode, transcode_batch, read_path_list, write_manifest,
-)
+from pozu_transcode import TranscodeConfig, transcode, transcode_batch, survey
 
 cfg = TranscodeConfig(crf=18, fps=30)
 
-# inspect without encoding
-info = probe("clip.mov")
-plan = plan_encode("clip.mov", "clip.mp4", info, cfg)
-print(plan.bucket, plan.canvas_w, plan.canvas_h)
-print(build_ffmpeg_command(plan))   # the exact ffmpeg argv
-
-# encode one file
+# one file -> returns a TranscodeRecord
 record = transcode("clip.mov", "clip.mp4", cfg)
 
-# encode an explicit list of videos and write a manifest
-sources = read_path_list("clips.txt")          # or any iterable of paths
-records = transcode_batch(sources, "out/", cfg)
-write_manifest(records, "out/manifest.json")
+# a list of videos -> transcodes each and writes out/manifest.json itself
+records = transcode_batch("clips.txt", "out/", cfg)
+
+# inspect a directory without transcoding -> list[SurveyEntry]
+for entry in survey("raw/", cfg):
+    print(entry.path, entry.bucket, entry.is_vfr)
 ```
+
+The configuration types (`TranscodeConfig`, `Bucket`, `DEFAULT_BUCKETS`) and the
+result dataclasses (`ProbeResult`, `Letterbox`, `EncodePlan`, `TranscodeRecord`,
+`SurveyEntry`) are public; the intermediate helpers (probing, planning, ffmpeg
+command building, …) are private to `pozu_transcode._core`.
 
 ## Development
 
