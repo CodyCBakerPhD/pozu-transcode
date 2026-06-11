@@ -14,8 +14,6 @@ frame rate, ~1s closed GOP for fast random-frame seeks, aspect-ratio bucketing
 with uniform-scale + letterbox pad (never stretch, never crop).
 """
 
-from __future__ import annotations
-
 import collections
 import json
 import math

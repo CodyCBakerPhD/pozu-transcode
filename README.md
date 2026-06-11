@@ -44,9 +44,11 @@ Requires **`ffmpeg` and `ffprobe` on your `PATH`** (they are external binaries,
 not pip dependencies).
 
 ```bash
-pip install -e .          # or: pip install pozu-transcode
-pip install -e ".[test]"  # with the test extra
+pip install -e .                   # or: pip install pozu-transcode
+pip install -e . --group test      # with the test dependency group (pip >= 25.1)
 ```
+
+Python 3.12+ is required.
 
 Check ffmpeg is visible:
 
@@ -173,7 +175,7 @@ command building, …) are private to `pozu_transcode._core`.
 ## Development
 
 ```bash
-pip install -e ".[test]"
+pip install -e . --group test   # pip >= 25.1, or: uv sync --group test
 pytest
 ```
 

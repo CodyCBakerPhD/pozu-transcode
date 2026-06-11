@@ -7,7 +7,7 @@ name = "pozu-transcode"
 version = "0.1.0"
 description = "Transcode local videos into the canonical, AR-bucketed, fast-seek H.264 space for pozu."
 readme = "README.md"
-requires-python = ">=3.9"
+requires-python = ">=3.12"
 license = { text = "MIT" }
 authors = [{ name = "Cody Baker" }]
 keywords = ["video", "transcode", "ffmpeg", "h264", "pose", "pozu"]
@@ -15,7 +15,7 @@ dependencies = [
     "rich-click",
 ]
 
-[project.optional-dependencies]
+[dependency-groups]
 test = ["pytest"]
 
 [project.scripts]

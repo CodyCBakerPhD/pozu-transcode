@@ -6,8 +6,6 @@ lives in :mod:`pozu_transcode._core`; this module only parses options and
 prints.
 """
 
-from __future__ import annotations
-
 from pathlib import Path
 from typing import List, Optional, Tuple
 

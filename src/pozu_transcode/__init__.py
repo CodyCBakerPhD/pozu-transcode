@@ -13,6 +13,8 @@ return. Intermediate helpers (probing, planning, ffmpeg-command building, …)
 are private to ``_core`` and not re-exported here.
 """
 
+from importlib.metadata import PackageNotFoundError, version
+
 from ._config import (
     DEFAULT_BUCKETS,
     Bucket,
@@ -29,7 +31,12 @@ from ._core import (
     transcode_batch,
 )
 
-__version__ = "0.1.0"
+try:
+    # Single source of truth is [project].version in pyproject.toml, surfaced
+    # here from the installed distribution metadata.
+    __version__ = version("pozu-transcode")
+except PackageNotFoundError:  # not installed (e.g. running from a raw checkout)
+    __version__ = "0.0.0+unknown"
 
 __all__ = [
     "__version__",

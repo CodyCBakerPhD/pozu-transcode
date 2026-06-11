@@ -5,8 +5,6 @@ package only re-exports the command-mirroring operations and the dataclasses),
 so the tests import them from the private module directly.
 """
 
-from __future__ import annotations
-
 import math
 
 import pytest

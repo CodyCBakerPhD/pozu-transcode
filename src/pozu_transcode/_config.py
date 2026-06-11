@@ -5,8 +5,6 @@ override. The :class:`Bucket` / :class:`TranscodeConfig` dataclasses are the
 shared vocabulary that ``core`` speaks in.
 """
 
-from __future__ import annotations
-
 from dataclasses import dataclass, field
 from typing import List
 
