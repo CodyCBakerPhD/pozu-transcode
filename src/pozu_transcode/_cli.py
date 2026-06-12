@@ -21,6 +21,7 @@ click.rich_click.SHOW_ARGUMENTS = True
 console = Console()
 
 
+# pozu
 @click.group(context_settings={"help_option_names": ["-h", "--help"]})
 @click.version_option(__version__, prog_name="pozu")
 def pozu() -> None:
@@ -30,11 +31,13 @@ def pozu() -> None:
     """
 
 
+# pozu transcode
 @pozu.group()
 def transcode() -> None:
     """Transcode local videos into the canonical **pozu** space."""
 
 
+# pozu transcode video INPUT OUTPUT
 @transcode.command()
 @click.argument("input", type=click.Path(exists=True, dir_okay=False, path_type=Path))
 @click.argument("output", type=click.Path(dir_okay=False, path_type=Path))
@@ -50,6 +53,7 @@ def video(input, output, crf, preset, gop_seconds, fps, allow_upscale, buckets):
     )
 
 
+# pozu transcode batch LIST_FILE OUTPUT_DIR
 @transcode.command()
 @click.argument("list_file", type=click.Path(exists=True, dir_okay=False, path_type=Path))
 @click.argument("output_dir", type=click.Path(file_okay=False, path_type=Path))
@@ -78,6 +82,7 @@ def batch(list_file, output_dir, crf, preset, gop_seconds, fps, allow_upscale, b
         console.print(f"[yellow]Note:[/yellow] no video paths found in {list_file}.")
 
 
+# pozu survey INPUT_DIR
 @pozu.command()
 @click.argument("input_dir", type=click.Path(exists=True, file_okay=False, path_type=Path))
 @shared_options
