@@ -23,7 +23,7 @@ from dataclasses import asdict, dataclass
 from pathlib import Path
 from typing import Dict, Iterator, List, Optional, Sequence, Union
 
-from ._config import DEFAULT_BUCKETS, VIDEO_EXTENSIONS, Bucket, TranscodeConfig
+from ._config import DEFAULT_CANVASES, VIDEO_EXTENSIONS, AspectCanvas, TranscodeConfig
 
 PathLike = Union[str, "os.PathLike[str]"]
 
@@ -123,9 +123,9 @@ def _even(x: float) -> int:
     return max(2, int(round(x / 2) * 2))
 
 
-def _pick_bucket(aspect_ratio: float, buckets: Sequence[Bucket] = DEFAULT_BUCKETS) -> Bucket:
+def _pick_canvas(aspect_ratio: float, canvases: Sequence[AspectCanvas] = DEFAULT_CANVASES) -> AspectCanvas:
     """Assign to the nearest bucket in log-AR space (minimizes letterbox area)."""
-    return min(buckets, key=lambda b: abs(math.log(aspect_ratio / b.aspect_ratio)))
+    return min(canvases, key=lambda b: abs(math.log(aspect_ratio / b.aspect_ratio)))
 
 
 def _compute_letterbox(
@@ -186,7 +186,7 @@ def _plan_encode(
 ) -> EncodePlan:
     """Resolve a probe + config into a concrete :class:`EncodePlan`."""
     config = config or TranscodeConfig()
-    bucket = _pick_bucket(probe_result.aspect_ratio, config.buckets)
+    bucket = _pick_canvas(probe_result.aspect_ratio, config.canvases)
     box = _compute_letterbox(
         probe_result.width, probe_result.height,
         bucket.width, bucket.height, config.allow_upscale,
@@ -262,7 +262,7 @@ def _read_path_list(list_file: PathLike) -> List[Path]:
 
 
 def _aspect_histogram(entries: Sequence[SurveyEntry], precision: int = 2) -> Dict[float, int]:
-    """Bucket survey entries into a rounded-AR -> count histogram."""
+    """AspectCanvas survey entries into a rounded-AR -> count histogram."""
     hist: "collections.Counter[float]" = collections.Counter()
     for e in entries:
         hist[round(e.aspect_ratio, precision)] += 1
@@ -359,7 +359,7 @@ def survey(
     entries: List[SurveyEntry] = []
     for src in _iter_videos(input_dir):
         m = _probe(src)
-        bucket = _pick_bucket(m.aspect_ratio, config.buckets)
+        bucket = _pick_canvas(m.aspect_ratio, config.canvases)
         entries.append(
             SurveyEntry(
                 path=str(src),

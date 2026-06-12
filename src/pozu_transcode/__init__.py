@@ -16,8 +16,8 @@ are private to ``_core`` and not re-exported here.
 from importlib.metadata import PackageNotFoundError, version
 
 from ._config import (
-    DEFAULT_BUCKETS,
-    Bucket,
+    DEFAULT_CANVASES,
+    AspectCanvas,
     TranscodeConfig,
 )
 from ._core import (
@@ -42,8 +42,8 @@ __all__ = [
     "__version__",
     # configuration
     "TranscodeConfig",
-    "Bucket",
-    "DEFAULT_BUCKETS",
+    "AspectCanvas",
+    "DEFAULT_CANVASES",
     # dataclasses (accepted / returned by the public operations)
     "ProbeResult",
     "Letterbox",

@@ -9,12 +9,12 @@ import math
 
 import pytest
 
-from pozu_transcode import Bucket, ProbeResult, TranscodeConfig
+from pozu_transcode import AspectCanvas, ProbeResult, TranscodeConfig
 from pozu_transcode._core import (
     _build_ffmpeg_command,
     _compute_letterbox,
     _even,
-    _pick_bucket,
+    _pick_canvas,
     _plan_encode,
     _read_path_list,
 )
@@ -30,26 +30,26 @@ def test_even(value, expected):
     assert _even(value) % 2 == 0
 
 
-# ── _pick_bucket() ───────────────────────────────────────────────────────────
+# ── _pick_canvas() ───────────────────────────────────────────────────────────
 def test_pick_bucket_nearest_ar():
     # exact matches land on their own bucket
-    assert _pick_bucket(1.0).name == "sq"
-    assert _pick_bucket(4 / 3).name == "4x3"
-    assert _pick_bucket(16 / 9).name == "16x9"
+    assert _pick_canvas(1.0).name == "sq"
+    assert _pick_canvas(4 / 3).name == "4x3"
+    assert _pick_canvas(16 / 9).name == "16x9"
     # near matches snap to the closest in log-AR space
-    assert _pick_bucket(1.05).name == "sq"
-    assert _pick_bucket(1.40).name == "4x3"
-    assert _pick_bucket(1.85).name == "16x9"
+    assert _pick_canvas(1.05).name == "sq"
+    assert _pick_canvas(1.40).name == "4x3"
+    assert _pick_canvas(1.85).name == "16x9"
     # an ultrawide source still picks the widest available bucket
-    assert _pick_bucket(2.39).name == "16x9"
+    assert _pick_canvas(2.39).name == "16x9"
 
 
 def test_pick_bucket_is_log_space():
     # midpoint in log space between sq (1.0) and 4x3 (1.333) is exp(mean of logs)
     mid = math.exp((math.log(1.0) + math.log(4 / 3)) / 2)
     # just above the log-midpoint should prefer 4x3
-    assert _pick_bucket(mid * 1.001).name == "4x3"
-    assert _pick_bucket(mid * 0.999).name == "sq"
+    assert _pick_canvas(mid * 1.001).name == "4x3"
+    assert _pick_canvas(mid * 0.999).name == "sq"
 
 
 # ── _compute_letterbox() ─────────────────────────────────────────────────────
@@ -155,7 +155,7 @@ def test_build_ffmpeg_command_contains_canonical_flags():
 
 
 def test_build_ffmpeg_command_custom_bucket():
-    cfg = TranscodeConfig(buckets=[Bucket("portrait", 540, 960)])
+    cfg = TranscodeConfig(canvases=[AspectCanvas("portrait", 540, 960)])
     plan = _plan_encode("in.mp4", "out.mp4", _probe(1080, 1920), cfg)
     assert plan.bucket == "portrait"
     cmd = _build_ffmpeg_command(plan)

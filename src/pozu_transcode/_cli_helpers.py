@@ -9,32 +9,32 @@ import rich_click as click
 
 from ._config import (
     DEFAULT_ALLOW_UPSCALE,
-    DEFAULT_BUCKETS,
+    DEFAULT_CANVASES,
     DEFAULT_CRF,
     DEFAULT_FPS,
     DEFAULT_GOP_SECONDS,
     DEFAULT_PRESET,
-    Bucket,
+    AspectCanvas,
     TranscodeConfig,
 )
 
 
-def _parse_buckets(values: Tuple[str, ...]) -> Optional[List[Bucket]]:
+def _parse_canvases(values: Tuple[str, ...]) -> Optional[List[AspectCanvas]]:
     """Parse repeatable ``NAME:WxH`` strings into a bucket list (or None)."""
     if not values:
         return None
-    buckets: List[Bucket] = []
+    canvases: List[AspectCanvas] = []
     for raw in values:
         try:
             name, dims = raw.split(":", 1)
             w_str, h_str = dims.lower().split("x", 1)
-            buckets.append(Bucket(name=name, width=int(w_str), height=int(h_str)))
+            canvases.append(AspectCanvas(name=name, width=int(w_str), height=int(h_str)))
         except ValueError:
             raise click.BadParameter(
                 f"{raw!r} is not in NAME:WxH form (e.g. 16x9:960x540)",
-                param_hint="--bucket",
+                param_hint="--canvas",
             )
-    return buckets
+    return canvases
 
 
 def shared_options(func):
@@ -52,8 +52,8 @@ def shared_options(func):
         click.option("--allow-upscale/--no-upscale", default=DEFAULT_ALLOW_UPSCALE,
                      show_default=True,
                      help="Allow upscaling sources smaller than the canvas."),
-        click.option("--bucket", "buckets", multiple=True, metavar="NAME:WxH",
-                     help="Override aspect buckets (repeatable). "
+        click.option("--canvas", "canvases", multiple=True, metavar="NAME:WxH",
+                     help="Override aspect canvases (repeatable). "
                           "Default: sq:720x720 4x3:832x624 16x9:960x540."),
     ]
     for option in reversed(options):
@@ -61,8 +61,8 @@ def shared_options(func):
     return func
 
 
-def _config_from(crf, preset, gop_seconds, fps, allow_upscale, buckets) -> TranscodeConfig:
-    parsed = _parse_buckets(buckets)
+def _config_from(crf, preset, gop_seconds, fps, allow_upscale, canvases) -> TranscodeConfig:
+    parsed = _parse_canvases(canvases)
     cfg = TranscodeConfig(
         crf=crf,
         preset=preset,
@@ -71,5 +71,5 @@ def _config_from(crf, preset, gop_seconds, fps, allow_upscale, buckets) -> Trans
         allow_upscale=allow_upscale,
     )
     if parsed is not None:
-        cfg.buckets = parsed
+        cfg.canvases = parsed
     return cfg

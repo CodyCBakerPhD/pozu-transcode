@@ -1,7 +1,7 @@
 """Configuration defaults for the canonical pozu transcode space.
 
 Everything here is a plain default that the CLI (and library callers) can
-override. The :class:`Bucket` / :class:`TranscodeConfig` dataclasses are the
+override. The :class:`AspectCanvas` / :class:`TranscodeConfig` dataclasses are the
 shared vocabulary that ``core`` speaks in.
 """
 
@@ -21,7 +21,7 @@ VIDEO_EXTENSIONS = (".mp4", ".mov", ".avi", ".mkv", ".webm", ".m4v")
 
 
 @dataclass(frozen=True)
-class Bucket:
+class AspectCanvas:
     """A fixed-aspect-ratio output canvas.
 
     Videos are assigned to the nearest bucket in log-aspect-ratio space, then
@@ -37,11 +37,11 @@ class Bucket:
         return self.width / self.height
 
 
-# Default buckets (~0.52 MP each, even dims). Tune to your corpus.
-DEFAULT_BUCKETS: List[Bucket] = [
-    Bucket("sq", 720, 720),    # 1.00
-    Bucket("4x3", 832, 624),   # 1.33
-    Bucket("16x9", 960, 540),  # 1.78
+# Default canvases (~0.52 MP each, even dims). Tune to your corpus.
+DEFAULT_CANVASES: List[AspectCanvas] = [
+    AspectCanvas("sq", 720, 720),    # 1.00
+    AspectCanvas("4x3", 832, 624),   # 1.33
+    AspectCanvas("16x9", 960, 540),  # 1.78
 ]
 
 
@@ -55,4 +55,4 @@ class TranscodeConfig:
     fps: int = DEFAULT_FPS
     allow_upscale: bool = DEFAULT_ALLOW_UPSCALE
     audio_bitrate: str = DEFAULT_AUDIO_BITRATE
-    buckets: List[Bucket] = field(default_factory=lambda: list(DEFAULT_BUCKETS))
+    canvases: List[AspectCanvas] = field(default_factory=lambda: list(DEFAULT_CANVASES))

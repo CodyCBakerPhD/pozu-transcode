@@ -42,9 +42,9 @@ def transcode() -> None:
 @click.argument("input", type=click.Path(exists=True, dir_okay=False, path_type=Path))
 @click.argument("output", type=click.Path(dir_okay=False, path_type=Path))
 @shared_options
-def video(input, output, crf, preset, gop_seconds, fps, allow_upscale, buckets):
+def video(input, output, crf, preset, gop_seconds, fps, allow_upscale, canvases):
     """Transcode a single INPUT video file to OUTPUT."""
-    cfg = _config_from(crf, preset, gop_seconds, fps, allow_upscale, buckets)
+    cfg = _config_from(crf, preset, gop_seconds, fps, allow_upscale, canvases)
     record = _core.transcode(input, output, cfg)
     console.print(
         f"[green]✓[/green] {record.src_path} → {record.out_path} "
@@ -58,14 +58,14 @@ def video(input, output, crf, preset, gop_seconds, fps, allow_upscale, buckets):
 @click.argument("list_file", type=click.Path(exists=True, dir_okay=False, path_type=Path))
 @click.argument("output_dir", type=click.Path(file_okay=False, path_type=Path))
 @shared_options
-def batch(list_file, output_dir, crf, preset, gop_seconds, fps, allow_upscale, buckets):
+def batch(list_file, output_dir, crf, preset, gop_seconds, fps, allow_upscale, canvases):
     """Transcode the videos listed in LIST_FILE into OUTPUT_DIR + manifest.json.
 
     LIST_FILE is a text file with one video path per line. Blank lines and
     lines starting with `#` are ignored; relative paths resolve against the
     list file's own directory.
     """
-    cfg = _config_from(crf, preset, gop_seconds, fps, allow_upscale, buckets)
+    cfg = _config_from(crf, preset, gop_seconds, fps, allow_upscale, canvases)
 
     def progress(i, total, record):
         console.print(
@@ -86,9 +86,9 @@ def batch(list_file, output_dir, crf, preset, gop_seconds, fps, allow_upscale, b
 @pozu.command()
 @click.argument("input_dir", type=click.Path(exists=True, file_okay=False, path_type=Path))
 @shared_options
-def survey(input_dir, crf, preset, gop_seconds, fps, allow_upscale, buckets):
+def survey(input_dir, crf, preset, gop_seconds, fps, allow_upscale, canvases):
     """Print a resolution + aspect-ratio histogram (no transcoding)."""
-    cfg = _config_from(crf, preset, gop_seconds, fps, allow_upscale, buckets)
+    cfg = _config_from(crf, preset, gop_seconds, fps, allow_upscale, canvases)
     entries = _core.survey(input_dir, cfg)
     if not entries:
         console.print("No videos found.")

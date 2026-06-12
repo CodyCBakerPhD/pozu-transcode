@@ -24,7 +24,7 @@ Every output is:
   canvas — never stretched, never cropped. Downscale-only by default (no
   upscaling small sources unless `--allow-upscale`).
 
-Default buckets (~0.52 MP each, even dims — tune to your corpus):
+Default canvases (~0.52 MP each, even dims — tune to your corpus):
 
 | name   | canvas   | aspect |
 | ------ | -------- | ------ |
@@ -93,9 +93,9 @@ subdir/clip03.mkv
 | `--gop-seconds`                 | `1.0`                                | Keyframe interval in seconds (closed GOP).               |
 | `--fps`                         | `30`                                 | Force CFR to this fps; `0` keeps source fps (still CFR). |
 | `--allow-upscale/--no-upscale`  | `--no-upscale`                       | Allow upscaling sources smaller than the canvas.         |
-| `--bucket NAME:WxH`             | `sq:720x720 4x3:832x624 16x9:960x540`| Override aspect buckets (repeatable).                    |
+| `--bucket NAME:WxH`             | `sq:720x720 4x3:832x624 16x9:960x540`| Override aspect canvases (repeatable).                    |
 
-Example with custom buckets and a higher-quality CRF:
+Example with custom canvases and a higher-quality CRF:
 
 ```bash
 pozu transcode batch clips.txt ./out \
@@ -167,7 +167,7 @@ for entry in survey("raw/", cfg):
     print(entry.path, entry.bucket, entry.is_vfr)
 ```
 
-The configuration types (`TranscodeConfig`, `Bucket`, `DEFAULT_BUCKETS`) and the
+The configuration types (`TranscodeConfig`, `AspectCanvas`, `DEFAULT_CANVASES`) and the
 result dataclasses (`ProbeResult`, `Letterbox`, `EncodePlan`, `TranscodeRecord`,
 `SurveyEntry`) are public; the intermediate helpers (probing, planning, ffmpeg
 command building, …) are private to `pozu_transcode._core`.
