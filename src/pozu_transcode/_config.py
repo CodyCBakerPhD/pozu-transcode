@@ -49,20 +49,28 @@ DEFAULT_CANVASES: List[AspectCanvas] = [
 class TranscodeConfig:
     """All knobs shared by the ``single``, ``batch`` and ``survey`` commands.
 
-    Attributes:
-        crf: Constant Rate Factor for x264 quality control (lower = better quality,
-            larger file; 0 = lossless, 51 = worst).
-        preset: x264 encoding speed preset; slower presets compress better at the
-            same CRF (e.g. ``"ultrafast"``, ``"slow"``, ``"veryslow"``).
-        gop_seconds: Target Group-of-Pictures duration in seconds; controls the
-            maximum distance between keyframes for random-access seeking.
-        fps: Output frame rate for constant-frame-rate (CFR) encoding; ``0`` keeps
-            the source frame rate while still enforcing CFR.
-        allow_upscale: When ``True``, inputs smaller than the chosen canvas are
-            scaled up to fill it; when ``False`` they are padded instead.
-        audio_bitrate: AAC audio encode bitrate (e.g. ``"128k"``).
-        canvases: Ordered list of candidate output canvases; each input video is
-            assigned to the nearest canvas in log-aspect-ratio space.
+    Attributes
+    ----------
+    crf : int
+        Constant Rate Factor for x264 quality control (lower = better quality,
+        larger file; 0 = lossless, 51 = worst).
+    preset : str
+        x264 encoding speed preset; slower presets compress better at the
+        same CRF (e.g. ``"ultrafast"``, ``"slow"``, ``"veryslow"``).
+    gop_seconds : float
+        Target Group-of-Pictures duration in seconds; controls the maximum
+        distance between keyframes for random-access seeking.
+    fps : int
+        Output frame rate for constant-frame-rate (CFR) encoding; ``0`` keeps
+        the source frame rate while still enforcing CFR.
+    allow_upscale : bool
+        When ``True``, inputs smaller than the chosen canvas are scaled up to
+        fill it; when ``False`` they are padded instead.
+    audio_bitrate : str
+        AAC audio encode bitrate (e.g. ``"128k"``).
+    canvases : list of AspectCanvas
+        Ordered list of candidate output canvases; each input video is assigned
+        to the nearest canvas in log-aspect-ratio space.
     """
 
     crf: int = DEFAULT_CRF
