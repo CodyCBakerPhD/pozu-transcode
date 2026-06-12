@@ -11,7 +11,7 @@ from pathlib import Path
 import rich_click as click
 from rich.console import Console
 
-from . import __version__
+from ._version import __version__
 from . import _core
 from ._cli_helpers import _config_from, shared_options
 
