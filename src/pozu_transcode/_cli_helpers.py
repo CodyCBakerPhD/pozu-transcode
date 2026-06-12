@@ -37,8 +37,8 @@ def _parse_canvases(values: Tuple[str, ...]) -> Optional[List[AspectCanvas]]:
     return canvases
 
 
-def shared_options(func):
-    """Attach the encode/bucket options shared by every command."""
+def _shared_options(func):
+    """Attach the encode/canvas options shared by every command."""
     options = [
         click.option("--crf", type=int, default=DEFAULT_CRF, show_default=True,
                      help="x264 constant rate factor (lower = higher quality)."),

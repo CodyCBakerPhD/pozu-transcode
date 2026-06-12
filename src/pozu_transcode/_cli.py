@@ -13,7 +13,7 @@ from rich.console import Console
 
 from ._version import __version__
 from . import _core
-from ._cli_helpers import _config_from, shared_options
+from ._cli_helpers import _config_from, _shared_options
 
 click.rich_click.USE_RICH_MARKUP = True
 click.rich_click.SHOW_ARGUMENTS = True
@@ -41,7 +41,7 @@ def transcode() -> None:
 @transcode.command()
 @click.argument("input", type=click.Path(exists=True, dir_okay=False, path_type=Path))
 @click.argument("output", type=click.Path(dir_okay=False, path_type=Path))
-@shared_options
+@_shared_options
 def video(input, output, crf, preset, gop_seconds, fps, allow_upscale, canvases):
     """Transcode a single INPUT video file to OUTPUT."""
     cfg = _config_from(crf, preset, gop_seconds, fps, allow_upscale, canvases)
@@ -57,7 +57,7 @@ def video(input, output, crf, preset, gop_seconds, fps, allow_upscale, canvases)
 @transcode.command()
 @click.argument("list_file", type=click.Path(exists=True, dir_okay=False, path_type=Path))
 @click.argument("output_dir", type=click.Path(file_okay=False, path_type=Path))
-@shared_options
+@_shared_options
 def batch(list_file, output_dir, crf, preset, gop_seconds, fps, allow_upscale, canvases):
     """Transcode the videos listed in LIST_FILE into OUTPUT_DIR + manifest.json.
 
@@ -85,7 +85,7 @@ def batch(list_file, output_dir, crf, preset, gop_seconds, fps, allow_upscale, c
 # pozu survey INPUT_DIR
 @pozu.command()
 @click.argument("input_dir", type=click.Path(exists=True, file_okay=False, path_type=Path))
-@shared_options
+@_shared_options
 def survey(input_dir, crf, preset, gop_seconds, fps, allow_upscale, canvases):
     """Print a resolution + aspect-ratio histogram (no transcoding)."""
     cfg = _config_from(crf, preset, gop_seconds, fps, allow_upscale, canvases)
@@ -105,6 +105,3 @@ def survey(input_dir, crf, preset, gop_seconds, fps, allow_upscale, canvases):
         console.print(f"  {ar:>5.2f}: {'#' * count} ({count})")
     console.print(f"\n{len(entries)} videos.")
 
-
-if __name__ == "__main__":
-    pozu()
