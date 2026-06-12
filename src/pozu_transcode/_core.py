@@ -19,102 +19,16 @@ import json
 import math
 import os
 import subprocess
-from dataclasses import asdict, dataclass
+from dataclasses import asdict
 from pathlib import Path
 from typing import Dict, Iterator, List, Optional, Sequence, Union
 
-from ._config import DEFAULT_CANVASES, VIDEO_EXTENSIONS, AspectCanvas, TranscodeConfig
+from ._config import DEFAULT_CONFIG, DEFAULT_CANVASES, VIDEO_EXTENSIONS, AspectCanvas, TranscodeConfig
+from ._models import EncodePlan, Letterbox, ProbeResult, SurveyEntry, TranscodeRecord
 
 PathLike = Union[str, "os.PathLike[str]"]
 
 MANIFEST_NAME = "manifest.json"
-
-
-# ── result dataclasses ───────────────────────────────────────────────────────
-@dataclass
-class ProbeResult:
-    """What ffprobe tells us about a source video's first video stream."""
-
-    width: int
-    height: int
-    fps_r: float           # r_frame_rate (nominal)
-    fps_avg: float         # avg_frame_rate (actual average)
-    codec: str
-    duration: float
-
-    @property
-    def aspect_ratio(self) -> float:
-        return self.width / self.height
-
-    @property
-    def is_vfr(self) -> bool:
-        return abs(self.fps_r - self.fps_avg) > 0.01
-
-
-@dataclass
-class Letterbox:
-    """Active (scaled) dimensions plus the pad offsets inside a canvas."""
-
-    active_w: int
-    active_h: int
-    pad_x: int
-    pad_y: int
-
-
-@dataclass
-class EncodePlan:
-    """A fully-resolved plan for one transcode — enough to build the command."""
-
-    src_path: str
-    out_path: str
-    src_w: int
-    src_h: int
-    bucket: str
-    canvas_w: int
-    canvas_h: int
-    active_w: int
-    active_h: int
-    pad_x: int
-    pad_y: int
-    fps: int
-    gop: int
-    crf: int
-    preset: str
-    audio_bitrate: str
-
-
-@dataclass
-class TranscodeRecord:
-    """One manifest entry: everything needed to locate + reason about an output."""
-
-    video_id: str
-    src_path: str
-    out_path: str
-    src_w: int
-    src_h: int
-    frame_count: int
-    bucket: str
-    canvas_w: int
-    canvas_h: int
-    active_w: int
-    active_h: int
-    pad_x: int
-    pad_y: int
-    fps: int
-
-
-@dataclass
-class SurveyEntry:
-    """One source video's geometry + assigned bucket (no transcoding)."""
-
-    path: str
-    width: int
-    height: int
-    aspect_ratio: float
-    codec: str
-    fps_r: float
-    is_vfr: bool
-    bucket: str
 
 
 # ── geometry helpers (private) ───────────────────────────────────────────────
@@ -185,7 +99,7 @@ def _plan_encode(
     config: Optional[TranscodeConfig] = None,
 ) -> EncodePlan:
     """Resolve a probe + config into a concrete :class:`EncodePlan`."""
-    config = config or TranscodeConfig()
+    config = config or DEFAULT_CONFIG
     bucket = _pick_canvas(probe_result.aspect_ratio, config.canvases)
     box = _compute_letterbox(
         probe_result.width, probe_result.height,
@@ -287,7 +201,7 @@ def transcode(
 
     Probe, plan, encode, then re-probe the output for ``frame_count``.
     """
-    config = config or TranscodeConfig()
+    config = config or DEFAULT_CONFIG
     src_probe = _probe(src_path)
     plan = _plan_encode(src_path, out_path, src_probe, config)
 
@@ -330,7 +244,7 @@ def transcode_batch(
     ``on_progress(index, total, record)`` is called after each output if given.
     Returns the list of records.
     """
-    config = config or TranscodeConfig()
+    config = config or DEFAULT_CONFIG
     out_root = Path(output_dir)
     out_root.mkdir(parents=True, exist_ok=True)
 
@@ -355,7 +269,7 @@ def survey(
 
     No transcoding — just resolution + aspect-ratio analysis.
     """
-    config = config or TranscodeConfig()
+    config = config or DEFAULT_CONFIG
     entries: List[SurveyEntry] = []
     for src in _iter_videos(input_dir):
         m = _probe(src)

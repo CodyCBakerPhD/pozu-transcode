@@ -16,15 +16,18 @@ are private to ``_core`` and not re-exported here.
 from ._version import __version__
 from ._config import (
     DEFAULT_CANVASES,
+    DEFAULT_CONFIG,
     AspectCanvas,
     TranscodeConfig,
 )
-from ._core import (
+from ._models import (
     EncodePlan,
     Letterbox,
     ProbeResult,
     SurveyEntry,
     TranscodeRecord,
+)
+from ._core import (
     survey,
     transcode,
     transcode_batch,
@@ -36,6 +39,7 @@ __all__ = [
     "TranscodeConfig",
     "AspectCanvas",
     "DEFAULT_CANVASES",
+    "DEFAULT_CONFIG",
     # dataclasses (accepted / returned by the public operations)
     "ProbeResult",
     "Letterbox",

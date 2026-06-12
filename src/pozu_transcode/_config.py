@@ -72,3 +72,7 @@ class TranscodeConfig:
     allow_upscale: bool = DEFAULT_ALLOW_UPSCALE
     audio_bitrate: str = DEFAULT_AUDIO_BITRATE
     canvases: List[AspectCanvas] = field(default_factory=lambda: list(DEFAULT_CANVASES))
+
+
+# Canonical transcode configuration. Tune to your corpus.
+DEFAULT_CONFIG: TranscodeConfig = TranscodeConfig()

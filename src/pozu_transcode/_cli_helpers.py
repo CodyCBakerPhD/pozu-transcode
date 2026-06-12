@@ -8,12 +8,7 @@ from typing import List, Optional, Tuple
 import rich_click as click
 
 from ._config import (
-    DEFAULT_ALLOW_UPSCALE,
-    DEFAULT_CANVASES,
-    DEFAULT_CRF,
-    DEFAULT_FPS,
-    DEFAULT_GOP_SECONDS,
-    DEFAULT_PRESET,
+    DEFAULT_CONFIG,
     AspectCanvas,
     TranscodeConfig,
 )
@@ -40,16 +35,16 @@ def _parse_canvases(values: Tuple[str, ...]) -> Optional[List[AspectCanvas]]:
 def _shared_options(func):
     """Attach the encode/canvas options shared by every command."""
     options = [
-        click.option("--crf", type=int, default=DEFAULT_CRF, show_default=True,
+        click.option("--crf", type=int, default=DEFAULT_CONFIG.crf, show_default=True,
                      help="x264 constant rate factor (lower = higher quality)."),
-        click.option("--preset", default=DEFAULT_PRESET, show_default=True,
+        click.option("--preset", default=DEFAULT_CONFIG.preset, show_default=True,
                      help="x264 preset (e.g. slow, medium, fast)."),
-        click.option("--gop-seconds", type=float, default=DEFAULT_GOP_SECONDS,
+        click.option("--gop-seconds", type=float, default=DEFAULT_CONFIG.gop_seconds,
                      show_default=True,
                      help="Keyframe interval in seconds (closed GOP)."),
-        click.option("--fps", type=int, default=DEFAULT_FPS, show_default=True,
+        click.option("--fps", type=int, default=DEFAULT_CONFIG.fps, show_default=True,
                      help="Force CFR to this fps; 0 keeps source fps (still CFR)."),
-        click.option("--allow-upscale/--no-upscale", default=DEFAULT_ALLOW_UPSCALE,
+        click.option("--allow-upscale/--no-upscale", default=DEFAULT_CONFIG.allow_upscale,
                      show_default=True,
                      help="Allow upscaling sources smaller than the canvas."),
         click.option("--canvas", "canvases", multiple=True, metavar="NAME:WxH",
