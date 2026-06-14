@@ -47,8 +47,8 @@ def video(input, output, crf, preset, gop_seconds, fps, allow_upscale, canvases)
     record = _core.transcode(input, output, cfg)
     console.print(
         f"[green]✓[/green] {record.src_path} → {record.out_path} "
-        f"\\[{record.bucket} {record.canvas_w}x{record.canvas_h}, "
-        f"{record.frame_count} frames @ {record.fps}fps]"
+        f"\\[{record.bucket} {record.canvas_width}x{record.canvas_height}, "
+        f"{record.frame_count} frames @ {record.frames_per_second}fps]"
     )
 
 
@@ -69,7 +69,7 @@ def batch(list_file, output_dir, crf, preset, gop_seconds, fps, allow_upscale, c
     def progress(i, total, record):
         console.print(
             f"[green]✓[/green] \\[{i}/{total}] {record.video_id} "
-            f"\\[{record.bucket} {record.canvas_w}x{record.canvas_h}]"
+            f"\\[{record.bucket} {record.canvas_width}x{record.canvas_height}]"
         )
 
     records = _core.transcode_batch(list_file, output_dir, cfg, on_progress=progress)
@@ -93,7 +93,7 @@ def survey(input_dir, crf, preset, gop_seconds, fps, allow_upscale, canvases):
         console.print("No videos found.")
         return
     for e in entries:
-        vfr = " [yellow]VFR[/yellow]" if e.is_vfr else ""
+        vfr = " [yellow]VFR[/yellow]" if e.has_variable_frame_rate else ""
         console.print(
             f"{e.path}: {e.width}x{e.height} AR={e.aspect_ratio:.2f} "
             f"{e.codec} {e.nominal_frames_per_second:.2f}fps → [cyan]{e.bucket}[/cyan]{vfr}"

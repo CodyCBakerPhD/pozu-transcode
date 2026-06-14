@@ -113,17 +113,17 @@ pozu transcode batch clips.txt ./out \
     "video_id": "clip01.mp4",
     "src_path": "raw/clip01.mov",
     "out_path": "out/clip01.mp4",
-    "src_w": 1920,
-    "src_h": 1080,
+    "source_width": 1920,
+    "source_height": 1080,
     "frame_count": 300,
     "bucket": "16x9",
-    "canvas_w": 960,
-    "canvas_h": 540,
-    "active_w": 960,
-    "active_h": 540,
+    "canvas_width": 960,
+    "canvas_height": 540,
+    "active_width": 960,
+    "active_height": 540,
     "pad_x": 0,
     "pad_y": 0,
-    "fps": 30
+    "frames_per_second": 30
   }
 ]
 ```
@@ -132,13 +132,13 @@ pozu transcode batch clips.txt ./out \
 | ---------------------- | -------------------------------------------------- |
 | `video_id`             | output filename (stable id within the manifest).   |
 | `src_path` / `out_path`| source and output paths.                           |
-| `src_w` / `src_h`      | original source dimensions.                        |
+| `source_width` / `source_height`     | original source dimensions.          |
 | `frame_count`          | number of frames in the (CFR) output.              |
 | `bucket`               | assigned bucket name.                              |
-| `canvas_w` / `canvas_h`| bucket canvas dimensions.                          |
-| `active_w` / `active_h`| scaled (letterboxed) content dimensions.           |
+| `canvas_width` / `canvas_height`     | bucket canvas dimensions.            |
+| `active_width` / `active_height`     | scaled (letterboxed) content dimensions. |
 | `pad_x` / `pad_y`      | letterbox pad offsets inside the canvas.           |
-| `fps`                  | output constant frame rate.                        |
+| `frames_per_second`    | output constant frame rate.                        |
 
 ## Library API
 
@@ -164,7 +164,7 @@ records = transcode_batch("clips.txt", "out/", cfg)
 
 # inspect a directory without transcoding -> list[SurveyEntry]
 for entry in survey("raw/", cfg):
-    print(entry.path, entry.bucket, entry.is_vfr)
+    print(entry.path, entry.bucket, entry.has_variable_frame_rate)
 ```
 
 The configuration types (`TranscodeConfig`, `AspectCanvas`, `DEFAULT_CANVASES`) and the

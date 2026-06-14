@@ -38,10 +38,10 @@ def _pick_canvas(aspect_ratio: float, canvases: Sequence[AspectCanvas] = DEFAULT
 
 
 def _compute_letterbox(
-    src_w: int,
-    src_h: int,
-    canvas_w: int,
-    canvas_h: int,
+    source_width: int,
+    source_height: int,
+    canvas_width: int,
+    canvas_height: int,
     allow_upscale: bool = False,
 ) -> Letterbox:
     """Uniform-scale ``src`` to fit inside the canvas, then center-pad.
@@ -49,11 +49,16 @@ def _compute_letterbox(
     Downscale-only unless ``allow_upscale`` — we never invent detail in sources
     smaller than the canvas.
     """
-    scale = min(canvas_w / src_w, canvas_h / src_h)
+    scale = min(canvas_width / source_width, canvas_height / source_height)
     if not allow_upscale:
         scale = min(scale, 1.0)
-    aw, ah = _even(src_w * scale), _even(src_h * scale)
-    return Letterbox(aw, ah, (canvas_w - aw) // 2, (canvas_h - ah) // 2)
+    active_width, active_height = _even(source_width * scale), _even(source_height * scale)
+    return Letterbox(
+        active_width,
+        active_height,
+        (canvas_width - active_width) // 2,
+        (canvas_height - active_height) // 2,
+    )
 
 
 # ── external tools ───────────────────────────────────────────────────────────
@@ -100,24 +105,28 @@ def _plan_encode(
         probe_result.width, probe_result.height,
         canvas.width, canvas.height, config.allow_upscale,
     )
-    fps = config.frames_per_second if config.frames_per_second else round(probe_result.nominal_frames_per_second)
-    fps = max(1, int(fps))
-    gop = max(1, round(fps * config.group_of_pictures_seconds))
+    frames_per_second = (
+        config.frames_per_second
+        if config.frames_per_second
+        else round(probe_result.nominal_frames_per_second)
+    )
+    frames_per_second = max(1, int(frames_per_second))
+    group_of_pictures = max(1, round(frames_per_second * config.group_of_pictures_seconds))
     return EncodePlan(
         src_path=str(src_path),
         out_path=str(out_path),
-        src_w=probe_result.width,
-        src_h=probe_result.height,
+        source_width=probe_result.width,
+        source_height=probe_result.height,
         bucket=canvas.name,
-        canvas_w=canvas.width,
-        canvas_h=canvas.height,
-        active_w=box.active_w,
-        active_h=box.active_h,
+        canvas_width=canvas.width,
+        canvas_height=canvas.height,
+        active_width=box.active_width,
+        active_height=box.active_height,
         pad_x=box.pad_x,
         pad_y=box.pad_y,
-        fps=fps,
-        gop=gop,
-        crf=config.constant_rate_factor,
+        frames_per_second=frames_per_second,
+        group_of_pictures=group_of_pictures,
+        constant_rate_factor=config.constant_rate_factor,
         preset=config.preset,
         audio_bitrate=config.audio_bitrate,
     )
@@ -126,18 +135,18 @@ def _plan_encode(
 def _build_ffmpeg_command(plan: EncodePlan) -> List[str]:
     """Build the ffmpeg argv for ``plan``. Pure: no side effects."""
     vf = (
-        f"scale={plan.active_w}:{plan.active_h}:flags=lanczos,"
-        f"pad={plan.canvas_w}:{plan.canvas_h}:{plan.pad_x}:{plan.pad_y}:color=black,"
+        f"scale={plan.active_width}:{plan.active_height}:flags=lanczos,"
+        f"pad={plan.canvas_width}:{plan.canvas_height}:{plan.pad_x}:{plan.pad_y}:color=black,"
         f"setsar=1"
     )
     return [
         "ffmpeg", "-y", "-i", plan.src_path,
         "-vf", vf,
         "-c:v", "libx264", "-profile:v", "high", "-pix_fmt", "yuv420p",
-        "-crf", str(plan.crf), "-preset", plan.preset,
-        "-g", str(plan.gop), "-keyint_min", str(plan.gop),
+        "-crf", str(plan.constant_rate_factor), "-preset", plan.preset,
+        "-g", str(plan.group_of_pictures), "-keyint_min", str(plan.group_of_pictures),
         "-x264-params", "scenecut=0:open-gop=0", "-bf", "2",
-        "-fps_mode", "cfr", "-r", str(plan.fps),
+        "-fps_mode", "cfr", "-r", str(plan.frames_per_second),
         "-c:a", "aac", "-b:a", plan.audio_bitrate,
         "-movflags", "+faststart", plan.out_path,
     ]

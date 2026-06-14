@@ -51,22 +51,22 @@ def transcode(
     subprocess.run(_build_ffmpeg_command(plan), check=True)
 
     out_probe = _probe(out_path)
-    frame_count = round(out_probe.duration * plan.fps)
+    frame_count = round(out_probe.duration * plan.frames_per_second)
     return TranscodeRecord(
         video_id=Path(out_path).name,
         src_path=str(src_path),
         out_path=str(out_path),
-        src_w=plan.src_w,
-        src_h=plan.src_h,
+        source_width=plan.source_width,
+        source_height=plan.source_height,
         frame_count=frame_count,
         bucket=plan.bucket,
-        canvas_w=plan.canvas_w,
-        canvas_h=plan.canvas_h,
-        active_w=plan.active_w,
-        active_h=plan.active_h,
+        canvas_width=plan.canvas_width,
+        canvas_height=plan.canvas_height,
+        active_width=plan.active_width,
+        active_height=plan.active_height,
         pad_x=plan.pad_x,
         pad_y=plan.pad_y,
-        fps=plan.fps,
+        frames_per_second=plan.frames_per_second,
     )
 
 
@@ -124,7 +124,7 @@ def survey(
                 aspect_ratio=m.aspect_ratio,
                 codec=m.codec,
                 nominal_frames_per_second=m.nominal_frames_per_second,
-                is_vfr=m.is_vfr,
+                has_variable_frame_rate=m.has_variable_frame_rate,
                 bucket=canvas.name,
             )
         )
