@@ -1,7 +1,6 @@
 """rich-click CLI for pozu-transcode.
 
-The ``pozu`` group nests ``transcode video``, ``transcode batch`` and
-``survey``, all sharing the same set of encode/bucket options.
+The ``pozu`` group nests ``transcode video``, ``transcode batch`` and ``survey``.
 """
 
 from pathlib import Path
@@ -11,7 +10,7 @@ from rich.console import Console
 
 from ._version import __version__
 from . import _core
-from ._helpers import _aspect_histogram, _config_from, _shared_options
+from ._helpers import _aspect_histogram
 
 click.rich_click.USE_RICH_MARKUP = True
 click.rich_click.SHOW_ARGUMENTS = True
@@ -39,11 +38,9 @@ def transcode() -> None:
 @transcode.command()
 @click.argument("input", type=click.Path(exists=True, dir_okay=False, path_type=Path))
 @click.argument("output", type=click.Path(dir_okay=False, path_type=Path))
-@_shared_options
-def video(input, output, crf, preset, gop_seconds, fps, allow_upscale, canvases):
+def video(input, output):
     """Transcode a single INPUT video file to OUTPUT."""
-    config = _config_from(crf, preset, gop_seconds, fps, allow_upscale, canvases)
-    record = _core.transcode(input, output, config)
+    record = _core.transcode(input, output)
     console.print(
         f"[green]✓[/green] {record.src_path} → {record.out_path} "
         f"\\[{record.bucket} {record.canvas_width}x{record.canvas_height}, "
@@ -55,15 +52,13 @@ def video(input, output, crf, preset, gop_seconds, fps, allow_upscale, canvases)
 @transcode.command()
 @click.argument("list_file", type=click.Path(exists=True, dir_okay=False, path_type=Path))
 @click.argument("output_dir", type=click.Path(file_okay=False, path_type=Path))
-@_shared_options
-def batch(list_file, output_dir, crf, preset, gop_seconds, fps, allow_upscale, canvases):
+def batch(list_file, output_dir):
     """Transcode the videos listed in LIST_FILE into OUTPUT_DIR + manifest.json.
 
     LIST_FILE is a text file with one video path per line. Blank lines and
     lines starting with `#` are ignored; relative paths resolve against the
     list file's own directory.
     """
-    config = _config_from(crf, preset, gop_seconds, fps, allow_upscale, canvases)
 
     def progress(i, total, record):
         console.print(
@@ -71,7 +66,7 @@ def batch(list_file, output_dir, crf, preset, gop_seconds, fps, allow_upscale, c
             f"\\[{record.bucket} {record.canvas_width}x{record.canvas_height}]"
         )
 
-    records = _core.transcode_batch(list_file, output_dir, config, on_progress=progress)
+    records = _core.transcode_batch(list_file, output_dir, on_progress=progress)
     manifest_path = Path(output_dir) / "manifest.json"
     console.print(
         f"\nWrote [cyan]{manifest_path}[/cyan] with {len(records)} entries."
@@ -83,11 +78,9 @@ def batch(list_file, output_dir, crf, preset, gop_seconds, fps, allow_upscale, c
 # pozu survey INPUT_DIR
 @pozu.command()
 @click.argument("input_dir", type=click.Path(exists=True, file_okay=False, path_type=Path))
-@_shared_options
-def survey(input_dir, crf, preset, gop_seconds, fps, allow_upscale, canvases):
+def survey(input_dir):
     """Print a resolution + aspect-ratio histogram (no transcoding)."""
-    config = _config_from(crf, preset, gop_seconds, fps, allow_upscale, canvases)
-    entries = _core.survey(input_dir, config)
+    entries = _core.survey(input_dir)
     if not entries:
         console.print("No videos found.")
         return

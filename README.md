@@ -59,8 +59,8 @@ ffmpeg -version
 ## Usage
 
 `pozu` is the top-level command. Transcoding lives under the `transcode`
-group; `survey` sits at the top level. They all share the same encode/bucket
-options.
+group; `survey` sits at the top level. The encode settings are fixed (the
+canonical space); there are no tuning flags.
 
 ```bash
 # one file
@@ -84,24 +84,10 @@ clip02.mp4
 subdir/clip03.mkv
 ```
 
-### Options
-
-| option                          | default                              | meaning                                                  |
-| ------------------------------- | ------------------------------------ | -------------------------------------------------------- |
-| `--crf`                         | `20`                                 | x264 constant rate factor (lower = higher quality).      |
-| `--preset`                      | `slow`                               | x264 preset (`slow`, `medium`, `fast`, ...).               |
-| `--gop-seconds`                 | `1.0`                                | Keyframe interval in seconds (closed GOP).               |
-| `--fps`                         | `30`                                 | Force CFR to this fps; `0` keeps source fps (still CFR). |
-| `--allow-upscale/--no-upscale`  | `--no-upscale`                       | Allow upscaling sources smaller than the canvas.         |
-| `--canvas NAME:WxH`             | `square:360x360 4x3:416x312 16x9:480x270`| Override aspect canvases (repeatable).                |
-
-Example with custom canvases and a higher-quality CRF:
-
-```bash
-pozu transcode batch clips.txt ./out \
-  --crf 18 --fps 25 \
-  --canvas square:768x768 --canvas 16x9:1024x576
-```
+The encode parameters (CRF, preset, frame rate, GOP, canvases, …) are fixed to
+the canonical space and not exposed as CLI flags. Library callers can still
+override them by passing a `TranscodeConfig` to `transcode` / `transcode_batch`
+/ `survey` (see below).
 
 ## `manifest.json` schema
 
