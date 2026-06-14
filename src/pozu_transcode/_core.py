@@ -105,9 +105,9 @@ def _plan_encode(
         probe_result.width, probe_result.height,
         bucket.width, bucket.height, config.allow_upscale,
     )
-    fps = config.fps if config.fps else round(probe_result.fps_r)
+    fps = config.frames_per_second if config.frames_per_second else round(probe_result.fps_r)
     fps = max(1, int(fps))
-    gop = max(1, round(fps * config.gop_seconds))
+    gop = max(1, round(fps * config.group_of_pictures_seconds))
     return EncodePlan(
         src_path=str(src_path),
         out_path=str(out_path),
@@ -122,7 +122,7 @@ def _plan_encode(
         pad_y=box.pad_y,
         fps=fps,
         gop=gop,
-        crf=config.crf,
+        crf=config.constant_rate_factor,
         preset=config.preset,
         audio_bitrate=config.audio_bitrate,
     )

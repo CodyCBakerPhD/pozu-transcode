@@ -9,10 +9,10 @@ from dataclasses import dataclass, field
 from typing import List
 
 # ── canonical encode defaults ───────────────────────────────────────────────
-DEFAULT_CRF: int = 20
+DEFAULT_CONSTANT_RATE_FACTOR: int = 20  # x264 quality knob (lower = better quality)
 DEFAULT_PRESET: str = "slow"
-DEFAULT_GOP_SECONDS: float = 1.0
-DEFAULT_FPS: int = 30  # force CFR to this; 0 keeps source fps (still CFR)
+DEFAULT_GROUP_OF_PICTURES_SECONDS: float = 1.0  # keyframe interval, in seconds
+DEFAULT_FRAMES_PER_SECOND: int = 30  # force constant frame rate (CFR); 0 keeps source rate
 DEFAULT_ALLOW_UPSCALE: bool = False
 DEFAULT_AUDIO_BITRATE: str = "128k"
 
@@ -37,46 +37,46 @@ class AspectCanvas:
         return self.width / self.height
 
 
-# Default canvases (~0.52 MP each, even dims). Tune to your corpus.
+# Default canvases (~0.13 MP each, even dims). Tune to your corpus.
 DEFAULT_CANVASES: List[AspectCanvas] = [
-    AspectCanvas("sq", 720, 720),    # 1.00
-    AspectCanvas("4x3", 832, 624),   # 1.33
-    AspectCanvas("16x9", 960, 540),  # 1.78
+    AspectCanvas("sq", 360, 360),    # 1.00
+    AspectCanvas("4x3", 416, 312),   # 1.33
+    AspectCanvas("16x9", 480, 270),  # 1.78
 ]
 
 
 @dataclass
 class TranscodeConfig:
-    """All knobs shared by the ``single``, ``batch`` and ``survey`` commands.
+    """All knobs shared by the ``video``, ``batch`` and ``survey`` commands.
 
     Attributes
     ----------
-    crf : int
-        Constant Rate Factor for x264 quality control (lower = better quality,
+    constant_rate_factor : int
+        x264 Constant Rate Factor (CRF) quality control (lower = better quality,
         larger file; 0 = lossless, 51 = worst).
     preset : str
-        x264 encoding speed preset; slower presets compress better at the
-        same CRF (e.g. ``"ultrafast"``, ``"slow"``, ``"veryslow"``).
-    gop_seconds : float
-        Target Group-of-Pictures duration in seconds; controls the maximum
+        x264 encoding speed preset; slower presets compress better at the same
+        Constant Rate Factor (e.g. ``"ultrafast"``, ``"slow"``, ``"veryslow"``).
+    group_of_pictures_seconds : float
+        Target Group of Pictures (GOP) duration in seconds; controls the maximum
         distance between keyframes for random-access seeking.
-    fps : int
-        Output frame rate for constant-frame-rate (CFR) encoding; ``0`` keeps
-        the source frame rate while still enforcing CFR.
+    frames_per_second : int
+        Output frame rate for Constant Frame Rate (CFR) encoding; ``0`` keeps the
+        source frame rate while still enforcing a constant frame rate.
     allow_upscale : bool
         When ``True``, inputs smaller than the chosen canvas are scaled up to
         fill it; when ``False`` they are padded instead.
     audio_bitrate : str
-        AAC audio encode bitrate (e.g. ``"128k"``).
+        Advanced Audio Coding (AAC) encode bitrate (e.g. ``"128k"``).
     canvases : list of AspectCanvas
         Ordered list of candidate output canvases; each input video is assigned
         to the nearest canvas in log-aspect-ratio space.
     """
 
-    crf: int = DEFAULT_CRF
+    constant_rate_factor: int = DEFAULT_CONSTANT_RATE_FACTOR
     preset: str = DEFAULT_PRESET
-    gop_seconds: float = DEFAULT_GOP_SECONDS
-    fps: int = DEFAULT_FPS
+    group_of_pictures_seconds: float = DEFAULT_GROUP_OF_PICTURES_SECONDS
+    frames_per_second: int = DEFAULT_FRAMES_PER_SECOND
     allow_upscale: bool = DEFAULT_ALLOW_UPSCALE
     audio_bitrate: str = DEFAULT_AUDIO_BITRATE
     canvases: List[AspectCanvas] = field(default_factory=lambda: list(DEFAULT_CANVASES))

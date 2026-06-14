@@ -24,13 +24,13 @@ Every output is:
   canvas — never stretched, never cropped. Downscale-only by default (no
   upscaling small sources unless `--allow-upscale`).
 
-Default canvases (~0.52 MP each, even dims — tune to your corpus):
+Default canvases (~0.13 MP each, even dims — tune to your corpus):
 
 | name   | canvas   | aspect |
 | ------ | -------- | ------ |
-| `sq`   | 720×720  | 1.00   |
-| `4x3`  | 832×624  | 1.33   |
-| `16x9` | 960×540  | 1.78   |
+| `sq`   | 360×360  | 1.00   |
+| `4x3`  | 416×312  | 1.33   |
+| `16x9` | 480×270  | 1.78   |
 
 The video filter chain is:
 
@@ -93,14 +93,14 @@ subdir/clip03.mkv
 | `--gop-seconds`                 | `1.0`                                | Keyframe interval in seconds (closed GOP).               |
 | `--fps`                         | `30`                                 | Force CFR to this fps; `0` keeps source fps (still CFR). |
 | `--allow-upscale/--no-upscale`  | `--no-upscale`                       | Allow upscaling sources smaller than the canvas.         |
-| `--bucket NAME:WxH`             | `sq:720x720 4x3:832x624 16x9:960x540`| Override aspect canvases (repeatable).                    |
+| `--canvas NAME:WxH`             | `sq:360x360 4x3:416x312 16x9:480x270`| Override aspect canvases (repeatable).                    |
 
 Example with custom canvases and a higher-quality CRF:
 
 ```bash
 pozu transcode batch clips.txt ./out \
   --crf 18 --fps 25 \
-  --bucket sq:768x768 --bucket 16x9:1024x576
+  --canvas sq:768x768 --canvas 16x9:1024x576
 ```
 
 ## `manifest.json` schema
@@ -154,7 +154,7 @@ from the top-level `pozu_transcode` package (the submodules are private):
 ```python
 from pozu_transcode import TranscodeConfig, transcode, transcode_batch, survey
 
-cfg = TranscodeConfig(crf=18, fps=30)
+cfg = TranscodeConfig(constant_rate_factor=18, frames_per_second=30)
 
 # one file -> returns a TranscodeRecord
 record = transcode("clip.mov", "clip.mp4", cfg)

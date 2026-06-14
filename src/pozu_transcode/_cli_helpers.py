@@ -35,21 +35,24 @@ def _parse_canvases(values: Tuple[str, ...]) -> Optional[List[AspectCanvas]]:
 def _shared_options(func):
     """Attach the encode/canvas options shared by every command."""
     options = [
-        click.option("--crf", type=int, default=DEFAULT_CONFIG.crf, show_default=True,
+        click.option("--crf", type=int, default=DEFAULT_CONFIG.constant_rate_factor,
+                     show_default=True,
                      help="x264 constant rate factor (lower = higher quality)."),
         click.option("--preset", default=DEFAULT_CONFIG.preset, show_default=True,
                      help="x264 preset (e.g. slow, medium, fast)."),
-        click.option("--gop-seconds", type=float, default=DEFAULT_CONFIG.gop_seconds,
+        click.option("--gop-seconds", type=float,
+                     default=DEFAULT_CONFIG.group_of_pictures_seconds,
                      show_default=True,
                      help="Keyframe interval in seconds (closed GOP)."),
-        click.option("--fps", type=int, default=DEFAULT_CONFIG.fps, show_default=True,
+        click.option("--fps", type=int, default=DEFAULT_CONFIG.frames_per_second,
+                     show_default=True,
                      help="Force CFR to this fps; 0 keeps source fps (still CFR)."),
         click.option("--allow-upscale/--no-upscale", default=DEFAULT_CONFIG.allow_upscale,
                      show_default=True,
                      help="Allow upscaling sources smaller than the canvas."),
         click.option("--canvas", "canvases", multiple=True, metavar="NAME:WxH",
                      help="Override aspect canvases (repeatable). "
-                          "Default: sq:720x720 4x3:832x624 16x9:960x540."),
+                          "Default: sq:360x360 4x3:416x312 16x9:480x270."),
     ]
     for option in reversed(options):
         func = option(func)
@@ -57,12 +60,14 @@ def _shared_options(func):
 
 
 def _config_from(crf, preset, gop_seconds, fps, allow_upscale, canvases) -> TranscodeConfig:
+    # CLI flags stay short (--crf/--fps/--gop-seconds); map them onto the
+    # full config field names here.
     parsed = _parse_canvases(canvases)
     cfg = TranscodeConfig(
-        crf=crf,
+        constant_rate_factor=crf,
         preset=preset,
-        gop_seconds=gop_seconds,
-        fps=fps,
+        group_of_pictures_seconds=gop_seconds,
+        frames_per_second=fps,
         allow_upscale=allow_upscale,
     )
     if parsed is not None:

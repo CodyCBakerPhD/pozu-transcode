@@ -101,8 +101,8 @@ def _probe(w, h, fps=30.0):
 def test_plan_encode_default_16x9_bucket():
     plan = _plan_encode("in.mp4", "out.mp4", _probe(1920, 1080))
     assert plan.bucket == "16x9"
-    assert (plan.canvas_w, plan.canvas_h) == (960, 540)
-    assert (plan.active_w, plan.active_h) == (960, 540)
+    assert (plan.canvas_w, plan.canvas_h) == (480, 270)
+    assert (plan.active_w, plan.active_h) == (480, 270)
     assert (plan.pad_x, plan.pad_y) == (0, 0)
 
 
@@ -111,21 +111,21 @@ def test_plan_encode_fps_and_gop():
     assert plan.fps == 30          # default
     assert plan.gop == 30          # round(30 * 1.0)
 
-    cfg = TranscodeConfig(fps=24, gop_seconds=2.0)
+    cfg = TranscodeConfig(frames_per_second=24, group_of_pictures_seconds=2.0)
     plan2 = _plan_encode("in.mp4", "out.mp4", _probe(1920, 1080), cfg)
     assert plan2.fps == 24
     assert plan2.gop == 48         # round(24 * 2.0)
 
 
 def test_plan_encode_fps_zero_keeps_source():
-    cfg = TranscodeConfig(fps=0, gop_seconds=1.0)
+    cfg = TranscodeConfig(frames_per_second=0, group_of_pictures_seconds=1.0)
     plan = _plan_encode("in.mp4", "out.mp4", _probe(1280, 720, fps=25.0), cfg)
     assert plan.fps == 25
     assert plan.gop == 25
 
 
 def test_plan_encode_carries_crf_preset():
-    cfg = TranscodeConfig(crf=18, preset="medium")
+    cfg = TranscodeConfig(constant_rate_factor=18, preset="medium")
     plan = _plan_encode("in.mp4", "out.mp4", _probe(1280, 720), cfg)
     assert plan.crf == 18
     assert plan.preset == "medium"
