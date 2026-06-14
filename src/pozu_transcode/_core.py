@@ -1,9 +1,9 @@
 """Framework-agnostic transcode operations: paths in, dataclasses out.
 
 This module holds only the public operations, which mirror the CLI commands:
-:func:`transcode` (``transcode video``), :func:`transcode_batch`
-(``transcode batch``) and :func:`survey` (``survey``). The intermediate
-helpers they build on live in :mod:`pozu_transcode._core_helpers`.
+`transcode` (``transcode video``), `transcode_batch`
+(``transcode batch``) and `survey` (``survey``). The intermediate
+helpers they build on live in `pozu_transcode._core_helpers`.
 
 It never imports click, never prints, and never touches S3 — it operates on
 local files and shells out to the external ``ffmpeg`` / ``ffprobe`` binaries

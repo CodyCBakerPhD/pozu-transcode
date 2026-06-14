@@ -1,10 +1,8 @@
-"""Private implementation helpers for :mod:`pozu_transcode._core`.
+"""Private implementation helpers for `pozu_transcode._core`.
 
-Keeps :mod:`pozu_transcode._core` focused on the public operations
-(:func:`~pozu_transcode._core.transcode`,
-:func:`~pozu_transcode._core.transcode_batch`,
-:func:`~pozu_transcode._core.survey`). Nothing here is part of the supported
-API. ffmpeg/ffprobe are external binaries (must be on ``PATH``).
+Keeps `pozu_transcode._core` focused on the public operations (`transcode`,
+`transcode_batch`, `survey`). Nothing here is part of the supported API.
+ffmpeg/ffprobe are external binaries (must be on ``PATH``).
 """
 
 import collections
@@ -95,7 +93,7 @@ def _plan_encode(
     probe_result: ProbeResult,
     config: Optional[TranscodeConfig] = None,
 ) -> EncodePlan:
-    """Resolve a probe + config into a concrete :class:`EncodePlan`."""
+    """Resolve a probe + config into a concrete `EncodePlan`."""
     config = config or DEFAULT_CONFIG
     canvas = _pick_canvas(probe_result.aspect_ratio, config.canvases)
     box = _compute_letterbox(

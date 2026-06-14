@@ -2,7 +2,7 @@
 
 The ``pozu`` group nests ``transcode video``, ``transcode batch`` and
 ``survey``, all sharing the same set of encode/bucket options. All real work
-lives in :mod:`pozu_transcode._core`; this module only defines click groups
+lives in `pozu_transcode._core`; this module only defines click groups
 and commands.
 """
 

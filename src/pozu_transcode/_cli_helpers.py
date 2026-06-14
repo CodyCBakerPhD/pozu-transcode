@@ -1,6 +1,6 @@
 """Helper utilities shared across CLI commands.
 
-Keeps :mod:`pozu_transcode._cli` focused on click group/command definitions.
+Keeps `pozu_transcode._cli` focused on click group/command definitions.
 """
 
 from typing import List, Optional, Tuple

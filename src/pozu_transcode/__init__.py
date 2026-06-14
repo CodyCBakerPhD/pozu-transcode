@@ -1,8 +1,8 @@
 """Transcode local videos into the canonical pozu space.
 
-The implementation lives in private submodules (:mod:`pozu_transcode._core`,
-:mod:`pozu_transcode._config`, :mod:`pozu_transcode._models`,
-:mod:`pozu_transcode._cli`, :mod:`pozu_transcode._version`). The public API is
+The implementation lives in private submodules (`pozu_transcode._core`,
+`pozu_transcode._config`, `pozu_transcode._models`,
+`pozu_transcode._cli`, `pozu_transcode._version`). The public API is
 intentionally small and mirrors the CLI commands.
 
 Routines
@@ -16,10 +16,10 @@ survey
 
 Notes
 -----
-The configuration types (:class:`TranscodeConfig`, :class:`AspectCanvas`) and
+The configuration types (`TranscodeConfig`, `AspectCanvas`) and
 the dataclasses those functions accept and return are also public. Intermediate
 helpers (probing, planning, ffmpeg-command building, …) are private to
-:mod:`pozu_transcode._core` and not re-exported here.
+`pozu_transcode._core` and not re-exported here.
 """
 
 from ._version import __version__

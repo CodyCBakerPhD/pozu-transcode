@@ -1,7 +1,7 @@
 """Configuration defaults for the canonical pozu transcode space.
 
 Everything here is a plain default that the CLI (and library callers) can
-override. The :class:`AspectCanvas` / :class:`TranscodeConfig` dataclasses are the
+override. The `AspectCanvas` / `TranscodeConfig` dataclasses are the
 shared vocabulary that ``core`` speaks in.
 """
 

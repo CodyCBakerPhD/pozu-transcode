@@ -1,7 +1,7 @@
 """Result dataclasses produced by the core transcode operations.
 
 These are the data structures that flow between the private helpers in
-:mod:`pozu_transcode._core` and are returned to callers of the public API.
+`pozu_transcode._core` and are returned to callers of the public API.
 """
 
 from dataclasses import dataclass
@@ -80,7 +80,7 @@ class EncodePlan:
     src_h : int
         Source video height in pixels.
     bucket : str
-        Name of the chosen :class:`~pozu_transcode.AspectCanvas`.
+        Name of the chosen `AspectCanvas`.
     canvas_w : int
         Total output canvas width in pixels.
     canvas_h : int
@@ -142,7 +142,7 @@ class TranscodeRecord:
     frame_count : int
         Total number of frames in the output.
     bucket : str
-        Name of the :class:`~pozu_transcode.AspectCanvas` used.
+        Name of the `AspectCanvas` used.
     canvas_w : int
         Total output canvas width in pixels.
     canvas_h : int
@@ -196,7 +196,7 @@ class SurveyEntry:
     is_vfr : bool
         ``True`` if the source has variable frame rate.
     bucket : str
-        Name of the nearest :class:`~pozu_transcode.AspectCanvas`.
+        Name of the nearest `AspectCanvas`.
     """
 
     path: str
