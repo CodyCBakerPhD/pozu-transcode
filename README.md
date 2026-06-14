@@ -89,7 +89,7 @@ subdir/clip03.mkv
 | option                          | default                              | meaning                                                  |
 | ------------------------------- | ------------------------------------ | -------------------------------------------------------- |
 | `--crf`                         | `20`                                 | x264 constant rate factor (lower = higher quality).      |
-| `--preset`                      | `slow`                               | x264 preset (`slow`, `medium`, `fast`, …).               |
+| `--preset`                      | `slow`                               | x264 preset (`slow`, `medium`, `fast`, ...).               |
 | `--gop-seconds`                 | `1.0`                                | Keyframe interval in seconds (closed GOP).               |
 | `--fps`                         | `30`                                 | Force CFR to this fps; `0` keeps source fps (still CFR). |
 | `--allow-upscale/--no-upscale`  | `--no-upscale`                       | Allow upscaling sources smaller than the canvas.         |
@@ -170,7 +170,7 @@ for entry in survey("raw/", cfg):
 The configuration types (`TranscodeConfig`, `AspectCanvas`, `DEFAULT_CANVASES`) and the
 result dataclasses (`ProbeResult`, `Letterbox`, `EncodePlan`, `TranscodeRecord`,
 `SurveyEntry`) are public; the intermediate helpers (probing, planning, ffmpeg
-command building, …) are private to `pozu_transcode._core`.
+command building, ...) are private to `pozu_transcode._core`.
 
 ## Development
 

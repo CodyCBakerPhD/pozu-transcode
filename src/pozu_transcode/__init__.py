@@ -17,7 +17,7 @@ Notes
 -----
 The configuration types (`TranscodeConfig`, `AspectCanvas`) and
 the dataclasses those functions accept and return are also public. Intermediate
-helpers (probing, planning, ffmpeg-command building, …) are private to
+helpers (probing, planning, ffmpeg-command building, ...) are private to
 `pozu_transcode._core` and not re-exported here.
 """
 
