@@ -13,6 +13,7 @@ from rich.console import Console
 
 from ._version import __version__
 from . import _core
+from ._core_helpers import _aspect_histogram
 from ._cli_helpers import _config_from, _shared_options
 
 click.rich_click.USE_RICH_MARKUP = True
@@ -99,7 +100,7 @@ def survey(input_dir, crf, preset, gop_seconds, fps, allow_upscale, canvases):
             f"{e.path}: {e.width}x{e.height} AR={e.aspect_ratio:.2f} "
             f"{e.codec} {e.fps_r:.2f}fps → [cyan]{e.bucket}[/cyan]{vfr}"
         )
-    hist = _core._aspect_histogram(entries)
+    hist = _aspect_histogram(entries)
     console.print("\n[bold]AR histogram:[/bold]")
     for ar, count in hist.items():
         console.print(f"  {ar:>5.2f}: {'#' * count} ({count})")

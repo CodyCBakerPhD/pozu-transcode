@@ -10,7 +10,7 @@ import math
 import pytest
 
 from pozu_transcode import AspectCanvas, ProbeResult, TranscodeConfig
-from pozu_transcode._core import (
+from pozu_transcode._core_helpers import (
     _build_ffmpeg_command,
     _compute_letterbox,
     _even,
