@@ -1,17 +1,10 @@
-"""Helper utilities shared across CLI commands.
-
-Keeps `pozu_transcode._cli` focused on click group/command definitions.
-"""
+"""Click option wiring shared by the CLI commands."""
 
 from typing import List, Optional, Tuple
 
 import rich_click as click
 
-from ._config import (
-    DEFAULT_CONFIG,
-    AspectCanvas,
-    TranscodeConfig,
-)
+from .._config import DEFAULT_CONFIG, AspectCanvas, TranscodeConfig
 
 
 def _parse_canvases(values: Tuple[str, ...]) -> Optional[List[AspectCanvas]]:

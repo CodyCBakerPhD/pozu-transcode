@@ -10,7 +10,7 @@ from pathlib import Path
 from typing import List, Optional
 
 from ._config import DEFAULT_CONFIG, TranscodeConfig
-from ._core_helpers import (
+from ._helpers import (
     PathLike,
     _build_ffmpeg_command,
     _iter_videos,

@@ -11,8 +11,7 @@ from rich.console import Console
 
 from ._version import __version__
 from . import _core
-from ._core_helpers import _aspect_histogram
-from ._cli_helpers import _config_from, _shared_options
+from ._helpers import _aspect_histogram, _config_from, _shared_options
 
 click.rich_click.USE_RICH_MARKUP = True
 click.rich_click.SHOW_ARGUMENTS = True
