@@ -22,8 +22,6 @@ from ._helpers import (
 )
 from ._models import SurveyEntry, TranscodeRecord
 
-MANIFEST_NAME = "manifest.json"
-
 
 def transcode(
     src_path: PathLike,
@@ -90,7 +88,7 @@ def transcode_batch(
         if on_progress is not None:
             on_progress(i + 1, len(sources), record)
 
-    _write_manifest(records, out_root / MANIFEST_NAME)
+    _write_manifest(records, out_root / "manifest.json")
     return records
 
 

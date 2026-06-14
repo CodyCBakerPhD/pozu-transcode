@@ -72,7 +72,7 @@ def batch(list_file, output_dir, crf, preset, gop_seconds, fps, allow_upscale, c
         )
 
     records = _core.transcode_batch(list_file, output_dir, config, on_progress=progress)
-    manifest_path = Path(output_dir) / _core.MANIFEST_NAME
+    manifest_path = Path(output_dir) / "manifest.json"
     console.print(
         f"\nWrote [cyan]{manifest_path}[/cyan] with {len(records)} entries."
     )
