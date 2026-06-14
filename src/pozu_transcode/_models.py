@@ -9,7 +9,7 @@ from dataclasses import dataclass
 
 @dataclass
 class ProbeResult:
-    """What ffprobe tells us about a source video's first video stream.
+    """What ffprobe tells us about a source video.
 
     Attributes
     ----------
@@ -46,7 +46,7 @@ class ProbeResult:
 
 @dataclass
 class Letterbox:
-    """Active (scaled) dimensions plus the pad offsets inside a canvas.
+    """How a source is scaled and padded to fit inside a canvas.
 
     Attributes
     ----------
@@ -68,7 +68,7 @@ class Letterbox:
 
 @dataclass
 class EncodePlan:
-    """A fully-resolved plan for one transcode — enough to build the ffmpeg command.
+    """A fully-resolved plan for one transcode.
 
     Attributes
     ----------
@@ -126,7 +126,7 @@ class EncodePlan:
 
 @dataclass
 class TranscodeRecord:
-    """One manifest entry: everything needed to locate and reason about an output.
+    """A record of one finished transcode (one entry in the manifest).
 
     Attributes
     ----------
@@ -178,7 +178,7 @@ class TranscodeRecord:
 
 @dataclass
 class SurveyEntry:
-    """One source video's geometry and assigned canvas (no transcoding).
+    """A source video's dimensions and the canvas it maps to.
 
     Attributes
     ----------
