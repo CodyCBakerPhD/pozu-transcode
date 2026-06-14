@@ -46,7 +46,6 @@ Requires **`ffmpeg`** to be installed separately.
 git clone https://github.com/CodyCBakerPhD/pozu-transcode
 cd pozu-transcode
 pip install -e .
-pip install -e . --group test
 ```
 
 Python 3.12+ is required.
