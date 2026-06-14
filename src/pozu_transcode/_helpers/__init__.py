@@ -1,9 +1,12 @@
 """Private implementation helpers, split by theme.
 
-geometry — canvas selection + letterbox math; probe — ffprobe wrapper;
-planning — probe/config to encode plan + ffmpeg command; io — filesystem
-discovery and manifest writing; cli — shared click options. Nothing here is
-part of the supported API.
+geometry: canvas selection + letterbox math
+probe:    ffprobe wrapper
+planning: probe/config to encode plan + ffmpeg command
+io:       filesystem discovery and manifest writing
+cli:      shared click options
+
+Nothing here is part of the supported API.
 """
 
 from .cli import _config_from, _parse_canvases, _shared_options
