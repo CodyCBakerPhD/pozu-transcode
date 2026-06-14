@@ -118,14 +118,14 @@ def test_plan_encode_fps_and_gop():
     assert plan.frames_per_second == 30          # default
     assert plan.group_of_pictures == 30          # round(30 * 1.0)
 
-    config = TranscodeConfig(frames_per_second=24, group_of_pictures_seconds=2.0)
+    config = TranscodeConfig(frames_per_second=24, group_of_pictures_in_seconds=2.0)
     plan2 = _plan_encode("in.mp4", "out.mp4", _probe(1920, 1080), config)
     assert plan2.frames_per_second == 24
     assert plan2.group_of_pictures == 48         # round(24 * 2.0)
 
 
 def test_plan_encode_fps_zero_keeps_source():
-    config = TranscodeConfig(frames_per_second=0, group_of_pictures_seconds=1.0)
+    config = TranscodeConfig(frames_per_second=0, group_of_pictures_in_seconds=1.0)
     plan = _plan_encode("in.mp4", "out.mp4", _probe(1280, 720, fps=25.0), config)
     assert plan.frames_per_second == 25
     assert plan.group_of_pictures == 25

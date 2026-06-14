@@ -11,7 +11,7 @@ from typing import List
 # ── canonical encode defaults ───────────────────────────────────────────────
 DEFAULT_CONSTANT_RATE_FACTOR: int = 20  # x264 quality knob (lower = better quality)
 DEFAULT_PRESET: str = "slow"
-DEFAULT_GROUP_OF_PICTURES_SECONDS: float = 1.0  # keyframe interval, in seconds
+DEFAULT_GROUP_OF_PICTURES_IN_SECONDS: float = 1.0  # keyframe interval, in seconds
 DEFAULT_FRAMES_PER_SECOND: int = 30  # force constant frame rate (CFR); 0 keeps source rate
 DEFAULT_ALLOW_UPSCALE: bool = False
 DEFAULT_AUDIO_BITRATE: str = "128k"
@@ -57,7 +57,7 @@ class TranscodeConfig:
     preset : str
         x264 encoding speed preset; slower presets compress better at the same
         Constant Rate Factor (e.g. ``"ultrafast"``, ``"slow"``, ``"veryslow"``).
-    group_of_pictures_seconds : float
+    group_of_pictures_in_seconds : float
         Target Group of Pictures (GOP) duration in seconds; controls the maximum
         distance between keyframes for random-access seeking.
     frames_per_second : int
@@ -75,7 +75,7 @@ class TranscodeConfig:
 
     constant_rate_factor: int = DEFAULT_CONSTANT_RATE_FACTOR
     preset: str = DEFAULT_PRESET
-    group_of_pictures_seconds: float = DEFAULT_GROUP_OF_PICTURES_SECONDS
+    group_of_pictures_in_seconds: float = DEFAULT_GROUP_OF_PICTURES_IN_SECONDS
     frames_per_second: int = DEFAULT_FRAMES_PER_SECOND
     allow_upscale: bool = DEFAULT_ALLOW_UPSCALE
     audio_bitrate: str = DEFAULT_AUDIO_BITRATE

@@ -27,7 +27,7 @@ def _plan_encode(
         else round(probe_result.nominal_frames_per_second)
     )
     frames_per_second = max(1, int(frames_per_second))
-    group_of_pictures = max(1, round(frames_per_second * config.group_of_pictures_seconds))
+    group_of_pictures = max(1, round(frames_per_second * config.group_of_pictures_in_seconds))
     return EncodePlan(
         src_path=str(src_path),
         out_path=str(out_path),

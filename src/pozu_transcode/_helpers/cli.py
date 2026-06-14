@@ -34,7 +34,7 @@ def _shared_options(func):
         click.option("--preset", default=DEFAULT_CONFIG.preset, show_default=True,
                      help="x264 preset (e.g. slow, medium, fast)."),
         click.option("--gop-seconds", type=float,
-                     default=DEFAULT_CONFIG.group_of_pictures_seconds,
+                     default=DEFAULT_CONFIG.group_of_pictures_in_seconds,
                      show_default=True,
                      help="Keyframe interval in seconds (closed GOP)."),
         click.option("--fps", type=int, default=DEFAULT_CONFIG.frames_per_second,
@@ -59,7 +59,7 @@ def _config_from(crf, preset, gop_seconds, fps, allow_upscale, canvases) -> Tran
     config = TranscodeConfig(
         constant_rate_factor=crf,
         preset=preset,
-        group_of_pictures_seconds=gop_seconds,
+        group_of_pictures_in_seconds=gop_seconds,
         frames_per_second=fps,
         allow_upscale=allow_upscale,
     )

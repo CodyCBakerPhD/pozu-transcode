@@ -97,7 +97,7 @@ class EncodePlan:
     frames_per_second : int
         Target constant frame rate.
     group_of_pictures : int
-        GOP size in frames (``frames_per_second × group_of_pictures_seconds``).
+        GOP size in frames (``frames_per_second × group_of_pictures_in_seconds``).
     constant_rate_factor : int
         x264 constant rate factor.
     preset : str
