@@ -26,11 +26,11 @@ Every output is:
 
 Default canvases (~0.13 MP each, even dims — tune to your corpus):
 
-| name   | canvas   | aspect |
-| ------ | -------- | ------ |
-| `sq`   | 360×360  | 1.00   |
-| `4x3`  | 416×312  | 1.33   |
-| `16x9` | 480×270  | 1.78   |
+| name     | canvas   | aspect |
+| -------- | -------- | ------ |
+| `square` | 360×360  | 1.00   |
+| `4x3`    | 416×312  | 1.33   |
+| `16x9`   | 480×270  | 1.78   |
 
 The video filter chain is:
 
@@ -93,14 +93,14 @@ subdir/clip03.mkv
 | `--gop-seconds`                 | `1.0`                                | Keyframe interval in seconds (closed GOP).               |
 | `--fps`                         | `30`                                 | Force CFR to this fps; `0` keeps source fps (still CFR). |
 | `--allow-upscale/--no-upscale`  | `--no-upscale`                       | Allow upscaling sources smaller than the canvas.         |
-| `--canvas NAME:WxH`             | `sq:360x360 4x3:416x312 16x9:480x270`| Override aspect canvases (repeatable).                    |
+| `--canvas NAME:WxH`             | `square:360x360 4x3:416x312 16x9:480x270`| Override aspect canvases (repeatable).                |
 
 Example with custom canvases and a higher-quality CRF:
 
 ```bash
 pozu transcode batch clips.txt ./out \
   --crf 18 --fps 25 \
-  --canvas sq:768x768 --canvas 16x9:1024x576
+  --canvas square:768x768 --canvas 16x9:1024x576
 ```
 
 ## `manifest.json` schema

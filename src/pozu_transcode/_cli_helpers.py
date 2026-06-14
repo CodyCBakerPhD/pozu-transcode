@@ -52,7 +52,7 @@ def _shared_options(func):
                      help="Allow upscaling sources smaller than the canvas."),
         click.option("--canvas", "canvases", multiple=True, metavar="NAME:WxH",
                      help="Override aspect canvases (repeatable). "
-                          "Default: sq:360x360 4x3:416x312 16x9:480x270."),
+                          "Default: square:360x360 4x3:416x312 16x9:480x270."),
     ]
     for option in reversed(options):
         func = option(func)

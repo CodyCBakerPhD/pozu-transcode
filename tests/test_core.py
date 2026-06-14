@@ -33,11 +33,11 @@ def test_even(value, expected):
 # ── _pick_canvas() ───────────────────────────────────────────────────────────
 def test_pick_bucket_nearest_ar():
     # exact matches land on their own bucket
-    assert _pick_canvas(1.0).name == "sq"
+    assert _pick_canvas(1.0).name == "square"
     assert _pick_canvas(4 / 3).name == "4x3"
     assert _pick_canvas(16 / 9).name == "16x9"
     # near matches snap to the closest in log-AR space
-    assert _pick_canvas(1.05).name == "sq"
+    assert _pick_canvas(1.05).name == "square"
     assert _pick_canvas(1.40).name == "4x3"
     assert _pick_canvas(1.85).name == "16x9"
     # an ultrawide source still picks the widest available bucket
@@ -45,11 +45,11 @@ def test_pick_bucket_nearest_ar():
 
 
 def test_pick_bucket_is_log_space():
-    # midpoint in log space between sq (1.0) and 4x3 (1.333) is exp(mean of logs)
+    # midpoint in log space between square (1.0) and 4x3 (1.333) is exp(mean of logs)
     mid = math.exp((math.log(1.0) + math.log(4 / 3)) / 2)
     # just above the log-midpoint should prefer 4x3
     assert _pick_canvas(mid * 1.001).name == "4x3"
-    assert _pick_canvas(mid * 0.999).name == "sq"
+    assert _pick_canvas(mid * 0.999).name == "square"
 
 
 # ── _compute_letterbox() ─────────────────────────────────────────────────────
@@ -70,7 +70,7 @@ def test_letterbox_no_upscale_pads_small_source():
 
 
 def test_letterbox_downscale_letterboxes_wide_into_square():
-    # 1920x1080 (16:9) into the sq 720x720 canvas: width-limited scale → pad top/bottom
+    # 1920x1080 (16:9) into the square 720x720 canvas: width-limited scale → pad top/bottom
     box = _compute_letterbox(1920, 1080, 720, 720)
     assert box.active_width == 720
     assert box.active_height == _even(1080 * (720 / 1920))  # 405 -> 406 even
