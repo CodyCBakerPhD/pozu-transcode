@@ -17,10 +17,11 @@ class ProbeResult:
         Pixel width of the video stream.
     height : int
         Pixel height of the video stream.
-    fps_r : float
-        Nominal frame rate as reported by ``r_frame_rate``.
-    fps_avg : float
-        Actual average frame rate as reported by ``avg_frame_rate``.
+    nominal_frames_per_second : float
+        Nominal frame rate as reported by ffprobe's ``r_frame_rate`` (the
+        lowest rate that can exactly represent every frame's timestamp).
+    average_frames_per_second : float
+        Actual average frame rate as reported by ffprobe's ``avg_frame_rate``.
     codec : str
         Codec name (e.g. ``"h264"``).
     duration : float
@@ -29,8 +30,8 @@ class ProbeResult:
 
     width: int
     height: int
-    fps_r: float
-    fps_avg: float
+    nominal_frames_per_second: float
+    average_frames_per_second: float
     codec: str
     duration: float
 
@@ -40,7 +41,7 @@ class ProbeResult:
 
     @property
     def is_vfr(self) -> bool:
-        return abs(self.fps_r - self.fps_avg) > 0.01
+        return abs(self.nominal_frames_per_second - self.average_frames_per_second) > 0.01
 
 
 @dataclass
@@ -191,8 +192,8 @@ class SurveyEntry:
         Width-to-height ratio of the source video.
     codec : str
         Codec name reported by ffprobe (e.g. ``"h264"``).
-    fps_r : float
-        Nominal frame rate as reported by ``r_frame_rate``.
+    nominal_frames_per_second : float
+        Nominal frame rate as reported by ffprobe's ``r_frame_rate``.
     is_vfr : bool
         ``True`` if the source has variable frame rate.
     bucket : str
@@ -204,6 +205,6 @@ class SurveyEntry:
     height: int
     aspect_ratio: float
     codec: str
-    fps_r: float
+    nominal_frames_per_second: float
     is_vfr: bool
     bucket: str

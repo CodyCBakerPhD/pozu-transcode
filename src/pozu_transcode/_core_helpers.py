@@ -79,8 +79,8 @@ def _probe(path: PathLike) -> ProbeResult:
     return ProbeResult(
         width=int(st["width"]),
         height=int(st["height"]),
-        fps_r=rate(st["r_frame_rate"]),
-        fps_avg=rate(st.get("avg_frame_rate", st["r_frame_rate"])),
+        nominal_frames_per_second=rate(st["r_frame_rate"]),
+        average_frames_per_second=rate(st.get("avg_frame_rate", st["r_frame_rate"])),
         codec=st["codec_name"],
         duration=float(j["format"]["duration"]),
     )
@@ -100,7 +100,7 @@ def _plan_encode(
         probe_result.width, probe_result.height,
         canvas.width, canvas.height, config.allow_upscale,
     )
-    fps = config.frames_per_second if config.frames_per_second else round(probe_result.fps_r)
+    fps = config.frames_per_second if config.frames_per_second else round(probe_result.nominal_frames_per_second)
     fps = max(1, int(fps))
     gop = max(1, round(fps * config.group_of_pictures_seconds))
     return EncodePlan(

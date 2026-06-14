@@ -123,7 +123,7 @@ def survey(
                 height=m.height,
                 aspect_ratio=m.aspect_ratio,
                 codec=m.codec,
-                fps_r=m.fps_r,
+                nominal_frames_per_second=m.nominal_frames_per_second,
                 is_vfr=m.is_vfr,
                 bucket=canvas.name,
             )

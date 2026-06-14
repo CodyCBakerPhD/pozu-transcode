@@ -95,7 +95,14 @@ def test_letterbox_dims_always_even():
 
 # ── _plan_encode() ───────────────────────────────────────────────────────────
 def _probe(w, h, fps=30.0):
-    return ProbeResult(width=w, height=h, fps_r=fps, fps_avg=fps, codec="h264", duration=10.0)
+    return ProbeResult(
+        width=w,
+        height=h,
+        nominal_frames_per_second=fps,
+        average_frames_per_second=fps,
+        codec="h264",
+        duration=10.0,
+    )
 
 
 def test_plan_encode_default_16x9_bucket():

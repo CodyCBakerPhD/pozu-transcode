@@ -98,7 +98,7 @@ def survey(input_dir, crf, preset, gop_seconds, fps, allow_upscale, canvases):
         vfr = " [yellow]VFR[/yellow]" if e.is_vfr else ""
         console.print(
             f"{e.path}: {e.width}x{e.height} AR={e.aspect_ratio:.2f} "
-            f"{e.codec} {e.fps_r:.2f}fps → [cyan]{e.bucket}[/cyan]{vfr}"
+            f"{e.codec} {e.nominal_frames_per_second:.2f}fps → [cyan]{e.bucket}[/cyan]{vfr}"
         )
     hist = _aspect_histogram(entries)
     console.print("\n[bold]AR histogram:[/bold]")
