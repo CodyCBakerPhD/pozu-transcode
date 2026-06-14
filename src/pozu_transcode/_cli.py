@@ -1,9 +1,7 @@
 """rich-click CLI for pozu-transcode.
 
 The ``pozu`` group nests ``transcode video``, ``transcode batch`` and
-``survey``, all sharing the same set of encode/bucket options. All real work
-lives in `pozu_transcode._core`; this module only defines click groups
-and commands.
+``survey``, all sharing the same set of encode/bucket options.
 """
 
 from pathlib import Path
