@@ -2,8 +2,7 @@
 
 The implementation lives in private submodules (`pozu_transcode._core`,
 `pozu_transcode._config`, `pozu_transcode._models`,
-`pozu_transcode._cli`, `pozu_transcode._version`). The public API is
-intentionally small and mirrors the CLI commands.
+`pozu_transcode._cli`, `pozu_transcode._version`).
 
 Routines
 --------
