@@ -1,16 +1,8 @@
 """Framework-agnostic transcode operations: paths in, dataclasses out.
 
-This module holds only the public operations, which mirror the CLI commands:
-`transcode` (``transcode video``), `transcode_batch`
-(``transcode batch``) and `survey` (``survey``). The intermediate
-helpers they build on live in `pozu_transcode._core_helpers`.
-
-It never imports click, never prints, and never touches S3 — it operates on
-local files and shells out to the external ``ffmpeg`` / ``ffprobe`` binaries.
-
-Canonical space (see README): H.264 High / yuv420p / +faststart, constant
-frame rate, ~1s closed GOP for fast random-frame seeks, aspect-ratio bucketing
-with uniform-scale + letterbox pad (never stretch, never crop).
+The public functions here back the CLI commands. They run entirely on local
+files — no click, no printing, no cloud — shelling out to ffmpeg/ffprobe to
+render videos into the project's canonical playback space (see the README).
 """
 
 import subprocess
