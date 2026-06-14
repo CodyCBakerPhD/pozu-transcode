@@ -6,8 +6,7 @@ This module holds only the public operations, which mirror the CLI commands:
 helpers they build on live in `pozu_transcode._core_helpers`.
 
 It never imports click, never prints, and never touches S3 — it operates on
-local files and shells out to the external ``ffmpeg`` / ``ffprobe`` binaries
-(which must be on ``PATH``).
+local files and shells out to the external ``ffmpeg`` / ``ffprobe`` binaries.
 
 Canonical space (see README): H.264 High / yuv420p / +faststart, constant
 frame rate, ~1s closed GOP for fast random-frame seeks, aspect-ratio bucketing

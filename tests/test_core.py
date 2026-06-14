@@ -118,22 +118,22 @@ def test_plan_encode_fps_and_gop():
     assert plan.frames_per_second == 30          # default
     assert plan.group_of_pictures == 30          # round(30 * 1.0)
 
-    cfg = TranscodeConfig(frames_per_second=24, group_of_pictures_seconds=2.0)
-    plan2 = _plan_encode("in.mp4", "out.mp4", _probe(1920, 1080), cfg)
+    config = TranscodeConfig(frames_per_second=24, group_of_pictures_seconds=2.0)
+    plan2 = _plan_encode("in.mp4", "out.mp4", _probe(1920, 1080), config)
     assert plan2.frames_per_second == 24
     assert plan2.group_of_pictures == 48         # round(24 * 2.0)
 
 
 def test_plan_encode_fps_zero_keeps_source():
-    cfg = TranscodeConfig(frames_per_second=0, group_of_pictures_seconds=1.0)
-    plan = _plan_encode("in.mp4", "out.mp4", _probe(1280, 720, fps=25.0), cfg)
+    config = TranscodeConfig(frames_per_second=0, group_of_pictures_seconds=1.0)
+    plan = _plan_encode("in.mp4", "out.mp4", _probe(1280, 720, fps=25.0), config)
     assert plan.frames_per_second == 25
     assert plan.group_of_pictures == 25
 
 
 def test_plan_encode_carries_crf_preset():
-    cfg = TranscodeConfig(constant_rate_factor=18, preset="medium")
-    plan = _plan_encode("in.mp4", "out.mp4", _probe(1280, 720), cfg)
+    config = TranscodeConfig(constant_rate_factor=18, preset="medium")
+    plan = _plan_encode("in.mp4", "out.mp4", _probe(1280, 720), config)
     assert plan.constant_rate_factor == 18
     assert plan.preset == "medium"
 
@@ -162,8 +162,8 @@ def test_build_ffmpeg_command_contains_canonical_flags():
 
 
 def test_build_ffmpeg_command_custom_bucket():
-    cfg = TranscodeConfig(canvases=[AspectCanvas("portrait", 540, 960)])
-    plan = _plan_encode("in.mp4", "out.mp4", _probe(1080, 1920), cfg)
+    config = TranscodeConfig(canvases=[AspectCanvas("portrait", 540, 960)])
+    plan = _plan_encode("in.mp4", "out.mp4", _probe(1080, 1920), config)
     assert plan.bucket == "portrait"
     cmd = _build_ffmpeg_command(plan)
     assert f"pad=540:960:" in " ".join(cmd)
