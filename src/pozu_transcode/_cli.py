@@ -43,8 +43,8 @@ def transcode() -> None:
 @_shared_options
 def video(input, output, crf, preset, gop_seconds, fps, allow_upscale, canvases):
     """Transcode a single INPUT video file to OUTPUT."""
-    cfg = _config_from(crf, preset, gop_seconds, fps, allow_upscale, canvases)
-    record = _core.transcode(input, output, cfg)
+    config = _config_from(crf, preset, gop_seconds, fps, allow_upscale, canvases)
+    record = _core.transcode(input, output, config)
     console.print(
         f"[green]✓[/green] {record.src_path} → {record.out_path} "
         f"\\[{record.bucket} {record.canvas_width}x{record.canvas_height}, "
@@ -64,7 +64,7 @@ def batch(list_file, output_dir, crf, preset, gop_seconds, fps, allow_upscale, c
     lines starting with `#` are ignored; relative paths resolve against the
     list file's own directory.
     """
-    cfg = _config_from(crf, preset, gop_seconds, fps, allow_upscale, canvases)
+    config = _config_from(crf, preset, gop_seconds, fps, allow_upscale, canvases)
 
     def progress(i, total, record):
         console.print(
@@ -72,7 +72,7 @@ def batch(list_file, output_dir, crf, preset, gop_seconds, fps, allow_upscale, c
             f"\\[{record.bucket} {record.canvas_width}x{record.canvas_height}]"
         )
 
-    records = _core.transcode_batch(list_file, output_dir, cfg, on_progress=progress)
+    records = _core.transcode_batch(list_file, output_dir, config, on_progress=progress)
     manifest_path = Path(output_dir) / _core.MANIFEST_NAME
     console.print(
         f"\nWrote [cyan]{manifest_path}[/cyan] with {len(records)} entries."
@@ -87,8 +87,8 @@ def batch(list_file, output_dir, crf, preset, gop_seconds, fps, allow_upscale, c
 @_shared_options
 def survey(input_dir, crf, preset, gop_seconds, fps, allow_upscale, canvases):
     """Print a resolution + aspect-ratio histogram (no transcoding)."""
-    cfg = _config_from(crf, preset, gop_seconds, fps, allow_upscale, canvases)
-    entries = _core.survey(input_dir, cfg)
+    config = _config_from(crf, preset, gop_seconds, fps, allow_upscale, canvases)
+    entries = _core.survey(input_dir, config)
     if not entries:
         console.print("No videos found.")
         return

@@ -63,7 +63,7 @@ def _config_from(crf, preset, gop_seconds, fps, allow_upscale, canvases) -> Tran
     # CLI flags stay short (--crf/--fps/--gop-seconds); map them onto the
     # full config field names here.
     parsed = _parse_canvases(canvases)
-    cfg = TranscodeConfig(
+    config = TranscodeConfig(
         constant_rate_factor=crf,
         preset=preset,
         group_of_pictures_seconds=gop_seconds,
@@ -71,5 +71,5 @@ def _config_from(crf, preset, gop_seconds, fps, allow_upscale, canvases) -> Tran
         allow_upscale=allow_upscale,
     )
     if parsed is not None:
-        cfg.canvases = parsed
-    return cfg
+        config.canvases = parsed
+    return config
