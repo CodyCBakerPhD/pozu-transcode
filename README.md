@@ -6,7 +6,7 @@ pure-web pose labeler that pulls random frames from random videos.
 
 All labeling, training, and inference run in this one canonical space, so the
 transcode is a one-way trip: we never map coordinates back to the original
-videos. This tool works on local files only — there is no S3 / cloud step.
+videos. This tool works on local files only.
 
 ## The canonical space
 
