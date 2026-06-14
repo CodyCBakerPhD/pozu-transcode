@@ -82,5 +82,4 @@ class TranscodeConfig:
     canvases: List[AspectCanvas] = field(default_factory=lambda: list(DEFAULT_CANVASES))
 
 
-# Canonical transcode configuration. Tune to your corpus.
 DEFAULT_CONFIG: TranscodeConfig = TranscodeConfig()
