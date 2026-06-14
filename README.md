@@ -16,12 +16,12 @@ Every output is:
   fast streaming + seeking).
 - **Constant frame rate** (`-fps_mode cfr -r <fps>`, default 30; `--fps 0`
   keeps the source rate but still forces CFR).
-- **Closed ~1s GOP** for fast random-frame seeks without all-intra bloat:
+- **Closed ~1s GoP (Group of Pictures)** for fast random-frame seeks without all-intra bloat:
   `-g`/`-keyint_min` ≈ `fps × gop_seconds`, `scenecut=0:open-gop=0`, `-bf 2`.
 - **`-crf 20`, `-preset slow`**, audio `aac @ 128k`.
 - **Aspect-ratio bucketed**: each video is assigned to the nearest canvas in
   log-aspect-ratio space, then **uniform-scaled + letterbox-padded** into that
-  canvas — never stretched, never cropped. Downscale-only by default (no
+  canvas (never stretched or cropped). Downscale-only by default (no
   upscaling small sources unless `--allow-upscale`).
 
 Default canvases (~0.13 MP each, even dims — tune to your corpus):
@@ -40,10 +40,11 @@ scale=AW:AH:flags=lanczos,pad=W:H:PADX:PADY:color=black,setsar=1
 
 ## Install
 
-Requires **`ffmpeg` and `ffprobe` on your `PATH`** (they are external binaries,
-not pip dependencies).
+Requires **`ffmpeg`** to be installed separately.
 
 ```bash
+git clone https://github.com/CodyCBakerPhD/pozu-transcode
+cd pozu-transcode
 pip install -e .                   # or: pip install pozu-transcode
 pip install -e . --group test      # with the test dependency group (pip >= 25.1)
 ```
