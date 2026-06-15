@@ -1,0 +1,69 @@
+name: Test dev container (and push on merge)
+
+on:
+  workflow_dispatch:
+  pull_request:
+  push:
+    branches:
+      - main
+
+jobs:
+  build-test-push:
+    name: Build and test dev image
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: write
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v6
+
+      - name: Set up QEMU
+        uses: docker/setup-qemu-action@v3
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v4
+
+      - name: Build image
+        uses: docker/build-push-action@v7
+        with:
+          context: .
+          file: containers/Dockerfile.dev
+          load: true
+          push: false
+          tags: ghcr.io/codycbakerphd/pozu-transcode:dev
+
+      - name: Smoke test the image
+        run: |
+          docker run --rm ghcr.io/codycbakerphd/pozu-transcode:dev --help
+          docker run --rm --entrypoint ffmpeg ghcr.io/codycbakerphd/pozu-transcode:dev -version
+
+      - name: Login to GitHub Container Registry
+        if: github.event_name != 'pull_request'
+        uses: docker/login-action@v4
+        with:
+          registry: ghcr.io
+          username: ${{ github.repository_owner }}
+          password: ${{ secrets._GITHUB_API_KEY }}
+
+      - name: Push to GHCR
+        if: github.event_name != 'pull_request'
+        run: docker push ghcr.io/codycbakerphd/pozu-transcode:dev
+
+  NotifyOnFailure:
+    runs-on: ubuntu-latest
+    permissions: {}
+    needs: [build-test-push]
+    if: ${{ always() && needs.build-test-push.result == 'failure' }}
+    steps:
+      - uses: dawidd6/action-send-mail@v17
+        with:
+          server_address: smtp.gmail.com
+          server_port: 465
+          username: ${{ secrets.MAIL_USERNAME }}
+          password: ${{ secrets.MAIL_PASSWORD }}
+          subject: "CI Failure: pozu-transcode Docker Dev Image"
+          to: cody.c.baker.phd@gmail.com
+          from: pozu-transcode
+          body: "The Docker dev image workflow failed, please check status at https://github.com/CodyCBakerPhD/pozu-transcode/actions/workflows/build_and_upload_docker_image_dev.yml"
