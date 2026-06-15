@@ -11,5 +11,6 @@ RUN apt-get update \
 ADD ./ pozu-transcode
 RUN cd pozu-transcode && python -m pip install --no-cache-dir .
 
-ENTRYPOINT ["pozu"]
-CMD ["--help"]
+# Use the image as an environment: pozu, ffmpeg, and ffprobe are all on PATH.
+# No single entrypoint is exposed; default to an interactive shell.
+CMD ["bash"]

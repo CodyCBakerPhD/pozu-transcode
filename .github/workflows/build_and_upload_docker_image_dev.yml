@@ -36,8 +36,8 @@ jobs:
 
       - name: Smoke test the image
         run: |
-          docker run --rm ghcr.io/codycbakerphd/pozu-transcode:dev --help
-          docker run --rm --entrypoint ffmpeg ghcr.io/codycbakerphd/pozu-transcode:dev -version
+          docker run --rm ghcr.io/codycbakerphd/pozu-transcode:dev pozu --help
+          docker run --rm ghcr.io/codycbakerphd/pozu-transcode:dev ffmpeg -version
 
       - name: Login to GitHub Container Registry
         if: github.event_name != 'pull_request'
