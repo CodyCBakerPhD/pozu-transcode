@@ -21,12 +21,20 @@ helpers (probing, planning, ffmpeg-command building, ...) are private to
 `pozu_transcode._core` and not re-exported here.
 """
 
-from ._version import __version__
+from beartype.claw import beartype_this_package
+
+beartype_this_package()  # runtime type-check every submodule as it is imported
+
 from ._config import (
     DEFAULT_CANVASES,
     DEFAULT_CONFIG,
     AspectCanvas,
     TranscodeConfig,
+)
+from ._core import (
+    survey,
+    transcode,
+    transcode_batch,
 )
 from ._models import (
     EncodePlan,
@@ -35,11 +43,7 @@ from ._models import (
     SurveyEntry,
     TranscodeRecord,
 )
-from ._core import (
-    survey,
-    transcode,
-    transcode_batch,
-)
+from ._version import __version__
 
 __all__ = [
     "__version__",

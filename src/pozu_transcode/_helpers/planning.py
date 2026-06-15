@@ -1,6 +1,5 @@
 """Resolve a probe + config into a concrete encode plan and ffmpeg command."""
 
-from typing import List, Optional
 
 from .._config import DEFAULT_CONFIG, TranscodeConfig
 from .._models import EncodePlan, ProbeResult
@@ -12,7 +11,7 @@ def _plan_encode(
     src_path: PathLike,
     out_path: PathLike,
     probe_result: ProbeResult,
-    config: Optional[TranscodeConfig] = None,
+    config: TranscodeConfig | None = None,
 ) -> EncodePlan:
     """Resolve a probe + config into a concrete `EncodePlan`."""
     config = config or DEFAULT_CONFIG
@@ -48,7 +47,7 @@ def _plan_encode(
     )
 
 
-def _build_ffmpeg_command(plan: EncodePlan) -> List[str]:
+def _build_ffmpeg_command(plan: EncodePlan) -> list[str]:
     """Build the ffmpeg argv for ``plan``. Pure: no side effects."""
     vf = (
         f"scale={plan.active_width}:{plan.active_height}:flags=lanczos,"

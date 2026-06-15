@@ -6,7 +6,6 @@ shared vocabulary that ``core`` speaks in.
 """
 
 from dataclasses import dataclass, field
-from typing import List
 
 # ── canonical encode defaults ───────────────────────────────────────────────
 DEFAULT_CONSTANT_RATE_FACTOR: int = 20  # x264 quality knob (lower = better quality)
@@ -38,7 +37,7 @@ class AspectCanvas:
 
 
 # Default canvases (~0.13 MP each, even dims). Tune to your corpus.
-DEFAULT_CANVASES: List[AspectCanvas] = [
+DEFAULT_CANVASES: list[AspectCanvas] = [
     AspectCanvas("square", 360, 360),  # 1.00
     AspectCanvas("4x3", 416, 312),     # 1.33
     AspectCanvas("16x9", 480, 270),    # 1.78
@@ -79,7 +78,7 @@ class TranscodeConfig:
     frames_per_second: int = DEFAULT_FRAMES_PER_SECOND
     allow_upscale: bool = DEFAULT_ALLOW_UPSCALE
     audio_bitrate: str = DEFAULT_AUDIO_BITRATE
-    canvases: List[AspectCanvas] = field(default_factory=lambda: list(DEFAULT_CANVASES))
+    canvases: list[AspectCanvas] = field(default_factory=lambda: list(DEFAULT_CANVASES))
 
 
 DEFAULT_CONFIG: TranscodeConfig = TranscodeConfig()

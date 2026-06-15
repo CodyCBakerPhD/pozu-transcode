@@ -12,11 +12,18 @@ license = { text = "MIT" }
 authors = [{ name = "Cody Baker" }]
 keywords = ["video", "transcode", "ffmpeg", "h264", "pose", "pozu"]
 dependencies = [
+    "beartype",
     "rich-click",
 ]
 
 [dependency-groups]
 test = ["pytest"]
+lint = [
+    "codespell",
+    "mypy",
+    "pre-commit",
+    "ruff",
+]
 
 [project.scripts]
 pozu = "pozu_transcode._cli:pozu"
@@ -26,3 +33,26 @@ packages = ["src/pozu_transcode"]
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]
+
+[tool.ruff]
+line-length = 120
+target-version = "py312"
+
+[tool.ruff.lint]
+select = ["E", "F", "W", "I", "UP", "B", "C4", "SIM", "RUF"]
+# RUF002/RUF022: the `×` in docstrings is a deliberate multiplication sign, and
+# `__all__` is grouped by role (config / dataclasses / operations), not sorted.
+ignore = ["RUF002", "RUF022"]
+
+[tool.ruff.lint.per-file-ignores]
+# `beartype_this_package()` must run before the package's own submodules are
+# imported, so those re-export imports deliberately follow it (not at top).
+"src/pozu_transcode/__init__.py" = ["E402"]
+
+[tool.mypy]
+python_version = "3.12"
+strict = true
+files = ["src", "tests"]
+
+[tool.codespell]
+skip = "./.git,./.venv,*.lock"

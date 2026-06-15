@@ -3,14 +3,14 @@
 import collections
 import json
 import os
+from collections.abc import Iterator, Sequence
 from dataclasses import asdict
 from pathlib import Path
-from typing import Dict, Iterator, List, Sequence, Union
 
 from .._config import VIDEO_EXTENSIONS
 from .._models import SurveyEntry, TranscodeRecord
 
-PathLike = Union[str, "os.PathLike[str]"]
+PathLike = str | os.PathLike[str]
 
 
 def _iter_videos(input_dir: PathLike) -> Iterator[Path]:
@@ -21,7 +21,7 @@ def _iter_videos(input_dir: PathLike) -> Iterator[Path]:
             yield path
 
 
-def _read_path_list(list_file: PathLike) -> List[Path]:
+def _read_path_list(list_file: PathLike) -> list[Path]:
     """Read a text file of video paths (one per line).
 
     Blank lines and lines starting with ``#`` are ignored. Relative paths are
@@ -29,7 +29,7 @@ def _read_path_list(list_file: PathLike) -> List[Path]:
     """
     path = Path(list_file)
     base = path.parent
-    sources: List[Path] = []
+    sources: list[Path] = []
     for line in path.read_text().splitlines():
         line = line.strip()
         if not line or line.startswith("#"):
@@ -39,9 +39,9 @@ def _read_path_list(list_file: PathLike) -> List[Path]:
     return sources
 
 
-def _aspect_histogram(entries: Sequence[SurveyEntry], precision: int = 2) -> Dict[float, int]:
+def _aspect_histogram(entries: Sequence[SurveyEntry], precision: int = 2) -> dict[float, int]:
     """Bin survey entries into a rounded-aspect-ratio -> count histogram."""
-    hist: "collections.Counter[float]" = collections.Counter()
+    hist: collections.Counter[float] = collections.Counter()
     for e in entries:
         hist[round(e.aspect_ratio, precision)] += 1
     return dict(sorted(hist.items()))
