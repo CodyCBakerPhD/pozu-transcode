@@ -11,6 +11,7 @@ from rich.console import Console
 from ._version import __version__
 from . import _core
 from ._helpers import _aspect_histogram
+from ._models import TranscodeRecord
 
 click.rich_click.USE_RICH_MARKUP = True
 click.rich_click.SHOW_ARGUMENTS = True
@@ -38,7 +39,7 @@ def transcode() -> None:
 @transcode.command()
 @click.argument("input", type=click.Path(exists=True, dir_okay=False, path_type=Path))
 @click.argument("output", type=click.Path(dir_okay=False, path_type=Path))
-def video(input, output):
+def video(input: Path, output: Path) -> None:
     """Transcode a single INPUT video file to OUTPUT."""
     record = _core.transcode(input, output)
     console.print(
@@ -52,7 +53,7 @@ def video(input, output):
 @transcode.command()
 @click.argument("list_file", type=click.Path(exists=True, dir_okay=False, path_type=Path))
 @click.argument("output_dir", type=click.Path(file_okay=False, path_type=Path))
-def batch(list_file, output_dir):
+def batch(list_file: Path, output_dir: Path) -> None:
     """Transcode the videos listed in LIST_FILE into OUTPUT_DIR + manifest.json.
 
     LIST_FILE is a text file with one video path per line. Blank lines and
@@ -60,7 +61,7 @@ def batch(list_file, output_dir):
     list file's own directory.
     """
 
-    def progress(i, total, record):
+    def progress(i: int, total: int, record: TranscodeRecord) -> None:
         console.print(
             f"[green]✓[/green] \\[{i}/{total}] {record.video_id} "
             f"\\[{record.bucket} {record.canvas_width}x{record.canvas_height}]"
@@ -78,7 +79,7 @@ def batch(list_file, output_dir):
 # pozu survey INPUT_DIR
 @pozu.command()
 @click.argument("input_dir", type=click.Path(exists=True, file_okay=False, path_type=Path))
-def survey(input_dir):
+def survey(input_dir: Path) -> None:
     """Print a resolution + aspect-ratio histogram (no transcoding)."""
     entries = _core.survey(input_dir)
     if not entries:
