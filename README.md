@@ -13,7 +13,7 @@ Every output is:
 - **`-crf 20`, `-preset slow`**, audio `aac @ 128k`.
 - **Aspect-ratio bucketed**: each video is assigned to the nearest canvas in log-aspect-ratio space, then **uniform-scaled + letterbox-padded** into that canvas (never stretched or cropped). Downscale-only by default (no upscaling small sources unless `--allow-upscale`).
 
-Default canvases (~0.13 MP each, even dims — tune to your corpus):
+Default canvases (~0.13 megapixels each, even dims):
 
 | name     | canvas   | aspect |
 | -------- | -------- | ------ |
