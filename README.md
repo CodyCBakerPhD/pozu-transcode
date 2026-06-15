@@ -1,28 +1,17 @@
 # Pozu (Transcoding)
 
-Transcode **local** video files into the canonical, aspect-ratio–bucketed,
-fast-seek H.264 space used by [pozu](https://github.com/CodyCBakerPhD/pozu), a
-pure-web pose labeler that pulls random frames from random videos.
+Transcode **local** video files into the canonical, aspect-ratio–bucketed, fast-seek H.264 space used by [pozu](https://github.com/CodyCBakerPhD/pozu), a pure-web pose labeler that pulls random frames from random videos.
 
-All labeling, training, and inference run in this one canonical space, so the
-transcode is a one-way trip: we never map coordinates back to the original
-videos.
+All labeling, training, and inference run in this one canonical space, so the transcode is a one-way trip: we never map coordinates back to the original videos.
 
 ## The canonical space
 
 Every output is:
-
-- **H.264 High / yuv420p**, `-movflags +faststart` (moov atom at the front for
-  fast streaming + seeking).
-- **Constant frame rate** (`-fps_mode cfr -r <fps>`, default 30; `--fps 0`
-  keeps the source rate but still forces CFR).
-- **Closed ~1s GoP (Group of Pictures)** for fast random-frame seeks without all-intra bloat:
-  `-g`/`-keyint_min` ≈ `fps × gop_seconds`, `scenecut=0:open-gop=0`, `-bf 2`.
+- **H.264 High / yuv420p**, `-movflags +faststart` (moov atom at the front for fast streaming + seeking).
+- **Constant frame rate** (`-fps_mode cfr -r <fps>`, default 30; `--fps 0` keeps the source rate but still forces CFR).
+- **Closed ~1s GoP (Group of Pictures)** for fast random-frame seeks without all-intra bloat: `-g`/`-keyint_min` ≈ `fps × gop_seconds`, `scenecut=0:open-gop=0`, `-bf 2`.
 - **`-crf 20`, `-preset slow`**, audio `aac @ 128k`.
-- **Aspect-ratio bucketed**: each video is assigned to the nearest canvas in
-  log-aspect-ratio space, then **uniform-scaled + letterbox-padded** into that
-  canvas (never stretched or cropped). Downscale-only by default (no
-  upscaling small sources unless `--allow-upscale`).
+- **Aspect-ratio bucketed**: each video is assigned to the nearest canvas in log-aspect-ratio space, then **uniform-scaled + letterbox-padded** into that canvas (never stretched or cropped). Downscale-only by default (no upscaling small sources unless `--allow-upscale`).
 
 Default canvases (~0.13 MP each, even dims — tune to your corpus):
 
@@ -57,9 +46,8 @@ ffmpeg -version
 
 ## Usage
 
-`pozu` is the top-level command. Transcoding lives under the `transcode`
-group; `survey` sits at the top level. The encode settings are fixed (the
-canonical space); there are no tuning flags.
+`pozu` is the top-level command. Transcoding lives under the `transcode` group; `survey` sits at the top level.
+The encode settings are fixed (the canonical space); there are no tuning flags.
 
 ```bash
 # one file
@@ -72,9 +60,8 @@ pozu transcode batch  clips.txt ./transcoded
 pozu survey  ./raw_videos
 ```
 
-`batch` reads `clips.txt`, a text file with **one video path per line**. Blank
-lines and lines starting with `#` are ignored, and relative paths resolve
-against the list file's own directory:
+`batch` reads `clips.txt`, a text file with **one video path per line**.
+Blank lines and lines starting with `#` are ignored, and relative paths resolve against the list file's own directory:
 
 ```text
 # clips.txt
@@ -83,10 +70,8 @@ clip02.mp4
 subdir/clip03.mkv
 ```
 
-The encode parameters (CRF, preset, frame rate, GOP, canvases, …) are fixed to
-the canonical space and not exposed as CLI flags. Library callers can still
-override them by passing a `TranscodeConfig` to `transcode` / `transcode_batch`
-/ `survey` (see below).
+The encode parameters (CRF, preset, frame rate, GOP, canvases, …) are fixed to the canonical space and not exposed as CLI flags.
+Library callers can still override them by passing a `TranscodeConfig` to `transcode` / `transcode_batch` / `survey` (see below).
 
 ## `manifest.json` schema
 
@@ -127,8 +112,8 @@ override them by passing a `TranscodeConfig` to `transcode` / `transcode_batch`
 
 ## Library API
 
-The public API is intentionally small and mirrors the three CLI commands. Import
-from the top-level `pozu_transcode` package (the submodules are private):
+The public API is intentionally small and mirrors the three CLI commands.
+Import from the top-level `pozu_transcode` package (the submodules are private):
 
 | function | mirrors |
 | --- | --- |
@@ -152,10 +137,7 @@ for entry in survey("raw/", cfg):
     print(entry.path, entry.bucket, entry.has_variable_frame_rate)
 ```
 
-The configuration types (`TranscodeConfig`, `AspectCanvas`, `DEFAULT_CANVASES`) and the
-result dataclasses (`ProbeResult`, `Letterbox`, `EncodePlan`, `TranscodeRecord`,
-`SurveyEntry`) are public; the intermediate helpers (probing, planning, ffmpeg
-command building, ...) are private to `pozu_transcode._core`.
+The configuration types (`TranscodeConfig`, `AspectCanvas`, `DEFAULT_CANVASES`) and the result dataclasses (`ProbeResult`, `Letterbox`, `EncodePlan`, `TranscodeRecord`, `SurveyEntry`) are public; the intermediate helpers (probing, planning, ffmpeg command building, ...) are private to `pozu_transcode._core`.
 
 ## Development
 
