@@ -3,7 +3,6 @@
 import functools
 import subprocess
 
-
 # Probe order: NVIDIA NVENC → AMD/Intel VAAPI → Intel Quick Sync → Apple VideoToolbox → CPU
 _ENCODER_PRIORITY = [
     "h264_nvenc",
