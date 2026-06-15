@@ -145,7 +145,7 @@ The configuration types (`TranscodeConfig`, `AspectCanvas`, `DEFAULT_CANVASES`) 
 ## Development
 
 ```bash
-pip install -e . --group test --group lint   # pip >= 25.1, or: uv sync --group test --group lint
+pip install -e . --group test --group lint
 pytest
 ```
 
