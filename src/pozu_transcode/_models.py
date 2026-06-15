@@ -119,6 +119,7 @@ class EncodePlan:
     group_of_pictures: int
     constant_rate_factor: int
     preset: str
+    encoder: str = "libx264"
 
 
 @dataclass

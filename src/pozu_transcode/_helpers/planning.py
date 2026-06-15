@@ -1,9 +1,9 @@
 """Resolve a probe + config into a concrete encode plan and ffmpeg command."""
 
-
 from .._config import DEFAULT_CONFIG, TranscodeConfig
 from .._models import EncodePlan, ProbeResult
 from .geometry import _compute_letterbox, _pick_canvas
+from .gpu import _detect_hw_encoder, _nvenc_preset
 from .io import PathLike
 
 
@@ -17,13 +17,13 @@ def _plan_encode(
     config = config or DEFAULT_CONFIG
     canvas = _pick_canvas(probe_result.aspect_ratio, config.canvases)
     box = _compute_letterbox(
-        probe_result.width, probe_result.height,
-        canvas.width, canvas.height,
+        probe_result.width,
+        probe_result.height,
+        canvas.width,
+        canvas.height,
     )
     frames_per_second = (
-        config.frames_per_second
-        if config.frames_per_second
-        else round(probe_result.nominal_frames_per_second)
+        config.frames_per_second if config.frames_per_second else round(probe_result.nominal_frames_per_second)
     )
     frames_per_second = max(1, int(frames_per_second))
     group_of_pictures = max(1, round(frames_per_second * config.group_of_pictures_in_seconds))
@@ -43,6 +43,7 @@ def _plan_encode(
         group_of_pictures=group_of_pictures,
         constant_rate_factor=config.constant_rate_factor,
         preset=config.preset,
+        encoder=config.encoder if config.encoder is not None else _detect_hw_encoder(),
     )
 
 
@@ -53,14 +54,51 @@ def _build_ffmpeg_command(plan: EncodePlan) -> list[str]:
         f"pad={plan.canvas_width}:{plan.canvas_height}:{plan.pad_x}:{plan.pad_y}:color=black,"
         f"setsar=1"
     )
-    return [
-        "ffmpeg", "-y", "-i", plan.src_path,
-        "-vf", vf,
-        "-c:v", "libx264", "-profile:v", "high", "-pix_fmt", "yuv420p",
-        "-crf", str(plan.constant_rate_factor), "-preset", plan.preset,
-        "-g", str(plan.group_of_pictures), "-keyint_min", str(plan.group_of_pictures),
-        "-x264-params", "scenecut=0:open-gop=0", "-bf", "2",
-        "-fps_mode", "cfr", "-r", str(plan.frames_per_second),
-        "-an",
-        "-movflags", "+faststart", plan.out_path,
-    ]
+    gop = ["-g", str(plan.group_of_pictures), "-keyint_min", str(plan.group_of_pictures)]
+    tail = ["-fps_mode", "cfr", "-r", str(plan.frames_per_second), "-an", "-movflags", "+faststart", plan.out_path]
+    crf = plan.constant_rate_factor
+
+    if plan.encoder == "h264_nvenc":
+        enc = [
+            "-c:v",
+            "h264_nvenc",
+            "-profile:v",
+            "high",
+            "-pix_fmt",
+            "yuv420p",
+            "-cq",
+            str(crf),
+            "-preset",
+            _nvenc_preset(plan.preset),
+            "-bf",
+            "2",
+        ]
+    elif plan.encoder == "h264_vaapi":
+        # Software decode/filter → VAAPI encode; format=nv12|vaapi,hwupload uploads frames.
+        vf = vf + ",format=nv12|vaapi,hwupload"
+        enc = ["-c:v", "h264_vaapi", "-profile:v", "100", "-qp", str(crf), "-bf", "2"]
+    elif plan.encoder == "h264_qsv":
+        enc = ["-c:v", "h264_qsv", "-profile:v", "high", "-pix_fmt", "yuv420p", "-global_quality", str(crf)]
+    elif plan.encoder == "h264_videotoolbox":
+        # VideoToolbox quality is 1-100 (100=best); invert CRF scale (0-51, lower=better).
+        vt_quality = max(1, min(100, round((51 - crf) * 100 / 51)))
+        enc = ["-c:v", "h264_videotoolbox", "-profile:v", "high", "-pix_fmt", "yuv420p", "-q:v", str(vt_quality)]
+    else:  # libx264 (CPU fallback)
+        enc = [
+            "-c:v",
+            "libx264",
+            "-profile:v",
+            "high",
+            "-pix_fmt",
+            "yuv420p",
+            "-crf",
+            str(crf),
+            "-preset",
+            plan.preset,
+            "-x264-params",
+            "scenecut=0:open-gop=0",
+            "-bf",
+            "2",
+        ]
+
+    return ["ffmpeg", "-y", "-i", plan.src_path, "-vf", vf, *enc, *gop, *tail]

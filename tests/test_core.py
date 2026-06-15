@@ -107,13 +107,13 @@ def test_plan_encode_default_16x9_bucket() -> None:
 
 def test_plan_encode_fps_and_gop() -> None:
     plan = _plan_encode("in.mp4", "out.mp4", _probe(1920, 1080))
-    assert plan.frames_per_second == 30          # default
-    assert plan.group_of_pictures == 30          # round(30 * 1.0)
+    assert plan.frames_per_second == 30  # default
+    assert plan.group_of_pictures == 30  # round(30 * 1.0)
 
     config = TranscodeConfig(frames_per_second=24, group_of_pictures_in_seconds=2.0)
     plan2 = _plan_encode("in.mp4", "out.mp4", _probe(1920, 1080), config)
     assert plan2.frames_per_second == 24
-    assert plan2.group_of_pictures == 48         # round(24 * 2.0)
+    assert plan2.group_of_pictures == 48  # round(24 * 2.0)
 
 
 def test_plan_encode_fps_zero_keeps_source() -> None:
@@ -170,13 +170,7 @@ def test_read_path_list_skips_blanks_and_comments(tmp_path: Path) -> None:
     (tmp_path / "b.mp4").touch()
     abs_path = tmp_path / "b.mp4"
     list_file = tmp_path / "clips.txt"
-    list_file.write_text(
-        "# a comment\n"
-        "a.mp4\n"
-        "\n"
-        "   \n"
-        f"{abs_path}\n"
-    )
+    list_file.write_text(f"# a comment\na.mp4\n\n   \n{abs_path}\n")
     paths = _read_path_list(list_file)
     # relative paths resolve against the list file's directory; absolute stay put
     assert paths == [tmp_path / "a.mp4", abs_path]

@@ -37,8 +37,8 @@ class AspectCanvas:
 # Default canvases (~0.13 MP each, even dims). Tune to your corpus.
 DEFAULT_CANVASES: list[AspectCanvas] = [
     AspectCanvas("square", 360, 360),  # 1.00
-    AspectCanvas("4x3", 416, 312),     # 1.33
-    AspectCanvas("16x9", 480, 270),    # 1.78
+    AspectCanvas("4x3", 416, 312),  # 1.33
+    AspectCanvas("16x9", 480, 270),  # 1.78
 ]
 
 
@@ -63,6 +63,9 @@ class TranscodeConfig:
     canvases : list of AspectCanvas
         Ordered list of candidate output canvases; each input video is assigned
         to the nearest canvas in log-aspect-ratio space.
+    encoder : str or None
+        Force a specific FFmpeg H.264 encoder (e.g. ``"libx264"``, ``"h264_nvenc"``).
+        ``None`` auto-detects the best available encoder.
     """
 
     constant_rate_factor: int = DEFAULT_CONSTANT_RATE_FACTOR
@@ -70,6 +73,7 @@ class TranscodeConfig:
     group_of_pictures_in_seconds: float = DEFAULT_GROUP_OF_PICTURES_IN_SECONDS
     frames_per_second: int = DEFAULT_FRAMES_PER_SECOND
     canvases: list[AspectCanvas] = field(default_factory=lambda: list(DEFAULT_CANVASES))
+    encoder: str | None = None
 
 
 DEFAULT_CONFIG: TranscodeConfig = TranscodeConfig()

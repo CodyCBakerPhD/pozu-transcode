@@ -3,13 +3,17 @@
 The ``pozu`` group nests ``transcode video``, ``transcode batch`` and ``survey``.
 """
 
+import logging
 from pathlib import Path
 
 import rich_click as click
 from rich.console import Console
+from rich.logging import RichHandler
 
 from . import _core
+from ._config import TranscodeConfig
 from ._helpers import _aspect_histogram
+from ._helpers.gpu import _ENCODER_PRIORITY
 from ._models import TranscodeRecord
 from ._version import __version__
 
@@ -17,6 +21,12 @@ click.rich_click.USE_RICH_MARKUP = True
 click.rich_click.SHOW_ARGUMENTS = True
 
 console = Console()
+
+logging.basicConfig(
+    level=logging.INFO,
+    format="%(message)s",
+    handlers=[RichHandler(console=console, show_path=False, show_time=False)],
+)
 
 
 # pozu
@@ -39,9 +49,17 @@ def transcode() -> None:
 @transcode.command()
 @click.argument("input", type=click.Path(exists=True, dir_okay=False, path_type=Path))
 @click.argument("output", type=click.Path(dir_okay=False, path_type=Path))
-def video(input: Path, output: Path) -> None:
+@click.option(
+    "--encoder",
+    type=click.Choice(_ENCODER_PRIORITY),
+    default=None,
+    show_default=True,
+    help="Force a specific H.264 encoder (default: auto-detect best available).",
+)
+def video(input: Path, output: Path, encoder: str | None) -> None:
     """Transcode a single INPUT video file to OUTPUT."""
-    record = _core.transcode(input, output)
+    config = TranscodeConfig(encoder=encoder) if encoder else None
+    record = _core.transcode(input, output, config)
     console.print(
         f"[green]✓[/green] {record.src_path} → {record.out_path} "
         f"\\[{record.bucket} {record.canvas_width}x{record.canvas_height}, "
@@ -53,7 +71,14 @@ def video(input: Path, output: Path) -> None:
 @transcode.command()
 @click.argument("list_file", type=click.Path(exists=True, dir_okay=False, path_type=Path))
 @click.argument("output_dir", type=click.Path(file_okay=False, path_type=Path))
-def batch(list_file: Path, output_dir: Path) -> None:
+@click.option(
+    "--encoder",
+    type=click.Choice(_ENCODER_PRIORITY),
+    default=None,
+    show_default=True,
+    help="Force a specific H.264 encoder (default: auto-detect best available).",
+)
+def batch(list_file: Path, output_dir: Path, encoder: str | None) -> None:
     """Transcode the videos listed in LIST_FILE into OUTPUT_DIR + manifest.json.
 
     LIST_FILE is a text file with one video path per line. Blank lines and
@@ -67,11 +92,10 @@ def batch(list_file: Path, output_dir: Path) -> None:
             f"\\[{record.bucket} {record.canvas_width}x{record.canvas_height}]"
         )
 
-    records = _core.transcode_batch(list_file, output_dir, on_progress=progress)
+    config = TranscodeConfig(encoder=encoder) if encoder else None
+    records = _core.transcode_batch(list_file, output_dir, config, on_progress=progress)
     manifest_path = Path(output_dir) / "manifest.json"
-    console.print(
-        f"\nWrote [cyan]{manifest_path}[/cyan] with {len(records)} entries."
-    )
+    console.print(f"\nWrote [cyan]{manifest_path}[/cyan] with {len(records)} entries.")
     if not records:
         console.print(f"[yellow]Note:[/yellow] no video paths found in {list_file}.")
 
