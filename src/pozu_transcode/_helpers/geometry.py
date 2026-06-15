@@ -1,7 +1,7 @@
 """Aspect-canvas selection and letterbox geometry."""
 
 import math
-from typing import Sequence
+from collections.abc import Sequence
 
 from .._config import DEFAULT_CANVASES, AspectCanvas
 from .._models import Letterbox

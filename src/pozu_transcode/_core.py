@@ -6,8 +6,8 @@ render videos into the project's canonical playback space (see the README).
 """
 
 import subprocess
+from collections.abc import Callable
 from pathlib import Path
-from typing import List, Optional
 
 from ._config import DEFAULT_CONFIG, TranscodeConfig
 from ._helpers import (
@@ -26,7 +26,7 @@ from ._models import SurveyEntry, TranscodeRecord
 def transcode(
     src_path: PathLike,
     out_path: PathLike,
-    config: Optional[TranscodeConfig] = None,
+    config: TranscodeConfig | None = None,
 ) -> TranscodeRecord:
     """Transcode one video file (mirrors ``pozu transcode video``).
 
@@ -62,9 +62,9 @@ def transcode(
 def transcode_batch(
     list_file: PathLike,
     output_dir: PathLike,
-    config: Optional[TranscodeConfig] = None,
-    on_progress=None,
-) -> List[TranscodeRecord]:
+    config: TranscodeConfig | None = None,
+    on_progress: Callable[[int, int, TranscodeRecord], None] | None = None,
+) -> list[TranscodeRecord]:
     """Transcode the videos listed in ``list_file`` (mirrors ``pozu transcode batch``).
 
     ``list_file`` is a text file with one video path per line (blank lines and
@@ -80,7 +80,7 @@ def transcode_batch(
     out_root.mkdir(parents=True, exist_ok=True)
 
     sources = _read_path_list(list_file)
-    records: List[TranscodeRecord] = []
+    records: list[TranscodeRecord] = []
     for i, src in enumerate(sources):
         out_path = out_root / (src.stem + ".mp4")
         record = transcode(src, out_path, config)
@@ -94,14 +94,14 @@ def transcode_batch(
 
 def survey(
     input_dir: PathLike,
-    config: Optional[TranscodeConfig] = None,
-) -> List[SurveyEntry]:
+    config: TranscodeConfig | None = None,
+) -> list[SurveyEntry]:
     """Probe every video under ``input_dir`` (mirrors ``pozu survey``).
 
     No transcoding — just resolution + aspect-ratio analysis.
     """
     config = config or DEFAULT_CONFIG
-    entries: List[SurveyEntry] = []
+    entries: list[SurveyEntry] = []
     for src in _iter_videos(input_dir):
         m = _probe(src)
         canvas = _pick_canvas(m.aspect_ratio, config.canvases)

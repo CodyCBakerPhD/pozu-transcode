@@ -145,10 +145,25 @@ The configuration types (`TranscodeConfig`, `AspectCanvas`, `DEFAULT_CANVASES`) 
 ## Development
 
 ```bash
-pip install -e . --group test   # pip >= 25.1, or: uv sync --group test
+pip install -e . --group test --group lint   # pip >= 25.1, or: uv sync --group test --group lint
 pytest
 ```
 
 The unit tests cover geometry (`even`, `pick_bucket`, `compute_letterbox`),
 planning (`plan_encode`), ffmpeg command construction, and path-list parsing
 (`read_path_list`) — and run **without ffmpeg installed**.
+
+### Linting & type checking
+
+The public API is runtime type-checked with [beartype](https://github.com/beartype/beartype):
+`beartype_this_package()` in `pozu_transcode/__init__.py` decorates every submodule on
+import, so a wrong-typed argument raises immediately (the PEP 484 numeric tower is enabled,
+so an `int` still satisfies a `float` hint, matching mypy).
+
+Static checks run through [pre-commit](https://pre-commit.com/) — **ruff** (lint), **mypy**
+(`strict`), and **codespell**:
+
+```bash
+pre-commit install        # run the hooks on every `git commit`
+pre-commit run --all-files # or run them on demand
+```

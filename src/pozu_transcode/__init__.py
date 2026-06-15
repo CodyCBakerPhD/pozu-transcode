@@ -21,12 +21,23 @@ helpers (probing, planning, ffmpeg-command building, ...) are private to
 `pozu_transcode._core` and not re-exported here.
 """
 
-from ._version import __version__
+from beartype import BeartypeConf
+from beartype.claw import beartype_this_package
+
+# Runtime type-check every submodule as it is imported. `is_pep484_tower` honors
+# PEP 484's numeric tower (an ``int`` satisfies a ``float`` hint), matching mypy.
+beartype_this_package(conf=BeartypeConf(is_pep484_tower=True))
+
 from ._config import (
     DEFAULT_CANVASES,
     DEFAULT_CONFIG,
     AspectCanvas,
     TranscodeConfig,
+)
+from ._core import (
+    survey,
+    transcode,
+    transcode_batch,
 )
 from ._models import (
     EncodePlan,
@@ -35,11 +46,7 @@ from ._models import (
     SurveyEntry,
     TranscodeRecord,
 )
-from ._core import (
-    survey,
-    transcode,
-    transcode_batch,
-)
+from ._version import __version__
 
 __all__ = [
     "__version__",

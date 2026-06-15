@@ -8,10 +8,10 @@ from pathlib import Path
 import rich_click as click
 from rich.console import Console
 
-from ._version import __version__
 from . import _core
 from ._helpers import _aspect_histogram
 from ._models import TranscodeRecord
+from ._version import __version__
 
 click.rich_click.USE_RICH_MARKUP = True
 click.rich_click.SHOW_ARGUMENTS = True
@@ -96,4 +96,3 @@ def survey(input_dir: Path) -> None:
     for ar, count in hist.items():
         console.print(f"  {ar:>5.2f}: {'#' * count} ({count})")
     console.print(f"\n{len(entries)} videos.")
-
