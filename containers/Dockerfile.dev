@@ -3,7 +3,6 @@ FROM python:3.13-slim
 LABEL org.opencontainers.image.source="https://github.com/CodyCBakerPhD/pozu-transcode"
 LABEL org.opencontainers.image.description="A Docker image of the latest development version of pozu-transcode (bundles ffmpeg)."
 
-# pozu-transcode shells out to ffmpeg/ffprobe, so bundle them into the image.
 RUN apt-get update \
     && apt-get install --no-install-recommends --yes ffmpeg \
     && rm -rf /var/lib/apt/lists/*
@@ -11,6 +10,4 @@ RUN apt-get update \
 ADD ./ pozu-transcode
 RUN cd pozu-transcode && python -m pip install --no-cache-dir .
 
-# Use the image as an environment: pozu, ffmpeg, and ffprobe are all on PATH.
-# No single entrypoint is exposed; default to an interactive shell.
 CMD ["bash"]
