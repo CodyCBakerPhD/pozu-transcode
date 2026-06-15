@@ -1,4 +1,4 @@
-name: Test dev container (and push on merge)
+name: Build and push dev container
 
 on:
   workflow_dispatch:
