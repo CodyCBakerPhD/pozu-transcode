@@ -153,7 +153,7 @@ The unit tests cover geometry (`even`, `pick_bucket`, `compute_letterbox`), plan
 
 ### Linting & type checking
 
-The public API is runtime type-checked with [beartype](https://github.com/beartype/beartype): `beartype_this_package()` in `pozu_transcode/__init__.py` decorates every submodule on import, so a wrong-typed argument raises immediately (the PEP 484 numeric tower is enabled, so an `int` still satisfies a `float` hint, matching mypy).
+The public API is runtime type-checked with [beartype](https://github.com/beartype/beartype): `beartype_this_package()` in `pozu_transcode/__init__.py` decorates every submodule on import, so a wrong-typed argument raises immediately. Checks are strict — the PEP 484 numeric tower is **not** enabled, so an `int` does not silently satisfy a `float` hint; functions that genuinely take either annotate `int | float` explicitly.
 
 Static checks run through [pre-commit](https://pre-commit.com/) — **ruff** (lint), **mypy** (`strict`), and **codespell**:
 

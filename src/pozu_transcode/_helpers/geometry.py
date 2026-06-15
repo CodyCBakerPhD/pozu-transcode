@@ -7,7 +7,7 @@ from .._config import DEFAULT_CANVASES, AspectCanvas
 from .._models import Letterbox
 
 
-def _even(x: float) -> int:
+def _even(x: int | float) -> int:
     """Round to the nearest even integer (>= 2). yuv420p requires even dims."""
     return max(2, int(round(x / 2) * 2))
 

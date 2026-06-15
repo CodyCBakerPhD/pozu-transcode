@@ -21,12 +21,9 @@ helpers (probing, planning, ffmpeg-command building, ...) are private to
 `pozu_transcode._core` and not re-exported here.
 """
 
-from beartype import BeartypeConf
 from beartype.claw import beartype_this_package
 
-# Runtime type-check every submodule as it is imported. `is_pep484_tower` honors
-# PEP 484's numeric tower (an ``int`` satisfies a ``float`` hint), matching mypy.
-beartype_this_package(conf=BeartypeConf(is_pep484_tower=True))
+beartype_this_package()  # runtime type-check every submodule as it is imported
 
 from ._config import (
     DEFAULT_CANVASES,
