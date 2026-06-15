@@ -74,7 +74,7 @@ def test_transcode_output_is_canonical(video_640x480: Path, tmp_path: Path) -> N
     probe = _probe(out)
     # output must be H.264 in yuv420p (ffprobe reports codec as h264)
     assert probe.codec == "h264"
-    # aspect: 640×480 → 4x3 bucket → canvas 416×312
+    # aspect: 640x480 -> 4x3 bucket -> canvas 416x312
     assert probe.width == 416
     assert probe.height == 312
 
@@ -84,7 +84,7 @@ def test_transcode_16x9_source(video_1920x1080: Path, tmp_path: Path) -> None:
     out = tmp_path / "out.mp4"
     transcode(video_1920x1080, out)
     probe = _probe(out)
-    # 16×9 canvas is 480×270
+    # 16x9 canvas is 480x270
     assert probe.width == 480
     assert probe.height == 270
 
@@ -94,7 +94,7 @@ def test_transcode_square_source(video_360x360: Path, tmp_path: Path) -> None:
     out = tmp_path / "out.mp4"
     transcode(video_360x360, out)
     probe = _probe(out)
-    # square canvas is 360×360
+    # square canvas is 360x360
     assert probe.width == 360
     assert probe.height == 360
 
