@@ -1,12 +1,12 @@
 # Pozu (Transcoding)
 
-Transcode **local** videos into the canonical, aspect-ratio–bucketed,
-fast-seek H.264 space used by [pozu](https://github.com/CodyCBakerPhD), a
+Transcode **local** video files into the canonical, aspect-ratio–bucketed,
+fast-seek H.264 space used by [pozu](https://github.com/CodyCBakerPhD/pozu), a
 pure-web pose labeler that pulls random frames from random videos.
 
 All labeling, training, and inference run in this one canonical space, so the
 transcode is a one-way trip: we never map coordinates back to the original
-videos. This tool works on local files only.
+videos.
 
 ## The canonical space
 
