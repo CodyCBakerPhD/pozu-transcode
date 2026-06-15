@@ -1,0 +1,28 @@
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[project]
+name = "pozu-transcode"
+version = "0.1.0"
+description = "Transcode local videos into the canonical, AR-bucketed, fast-seek H.264 space for pozu."
+readme = "README.md"
+requires-python = ">=3.12"
+license = { text = "MIT" }
+authors = [{ name = "Cody Baker" }]
+keywords = ["video", "transcode", "ffmpeg", "h264", "pose", "pozu"]
+dependencies = [
+    "rich-click",
+]
+
+[dependency-groups]
+test = ["pytest"]
+
+[project.scripts]
+pozu = "pozu_transcode._cli:pozu"
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/pozu_transcode"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
