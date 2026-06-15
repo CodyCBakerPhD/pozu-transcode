@@ -95,9 +95,7 @@ def batch(list_file: Path, output_dir: Path, encoder: str | None) -> None:
     config = TranscodeConfig(encoder=encoder) if encoder else None
     records = _core.transcode_batch(list_file, output_dir, config, on_progress=progress)
     manifest_path = Path(output_dir) / "manifest.json"
-    console.print(
-        f"\nWrote [cyan]{manifest_path}[/cyan] with {len(records)} entries."
-    )
+    console.print(f"\nWrote [cyan]{manifest_path}[/cyan] with {len(records)} entries.")
     if not records:
         console.print(f"[yellow]Note:[/yellow] no video paths found in {list_file}.")
 

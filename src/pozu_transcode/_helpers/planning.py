@@ -1,6 +1,5 @@
 """Resolve a probe + config into a concrete encode plan and ffmpeg command."""
 
-
 from .._config import DEFAULT_CONFIG, TranscodeConfig
 from .._models import EncodePlan, ProbeResult
 from .geometry import _compute_letterbox, _pick_canvas
@@ -18,13 +17,13 @@ def _plan_encode(
     config = config or DEFAULT_CONFIG
     canvas = _pick_canvas(probe_result.aspect_ratio, config.canvases)
     box = _compute_letterbox(
-        probe_result.width, probe_result.height,
-        canvas.width, canvas.height,
+        probe_result.width,
+        probe_result.height,
+        canvas.width,
+        canvas.height,
     )
     frames_per_second = (
-        config.frames_per_second
-        if config.frames_per_second
-        else round(probe_result.nominal_frames_per_second)
+        config.frames_per_second if config.frames_per_second else round(probe_result.nominal_frames_per_second)
     )
     frames_per_second = max(1, int(frames_per_second))
     group_of_pictures = max(1, round(frames_per_second * config.group_of_pictures_in_seconds))
@@ -61,10 +60,22 @@ def _build_ffmpeg_command(plan: EncodePlan) -> list[str]:
     if plan.encoder == "h264_nvenc":
         return [
             *base,
-            "-c:v", "h264_nvenc", "-profile:v", "high", "-pix_fmt", "yuv420p",
-            "-cq", str(plan.constant_rate_factor), "-preset", _nvenc_preset(plan.preset),
-            "-g", str(plan.group_of_pictures), "-keyint_min", str(plan.group_of_pictures),
-            "-bf", "2",
+            "-c:v",
+            "h264_nvenc",
+            "-profile:v",
+            "high",
+            "-pix_fmt",
+            "yuv420p",
+            "-cq",
+            str(plan.constant_rate_factor),
+            "-preset",
+            _nvenc_preset(plan.preset),
+            "-g",
+            str(plan.group_of_pictures),
+            "-keyint_min",
+            str(plan.group_of_pictures),
+            "-bf",
+            "2",
             *tail,
         ]
 
@@ -72,20 +83,39 @@ def _build_ffmpeg_command(plan: EncodePlan) -> list[str]:
         # Software decode/filter → VAAPI encode; format=nv12 feeds the VAAPI encoder.
         vf_vaapi = vf + ",format=nv12|vaapi,hwupload"
         return [
-            *base[:-2], "-vf", vf_vaapi,
-            "-c:v", "h264_vaapi", "-profile:v", "100",
-            "-qp", str(plan.constant_rate_factor),
-            "-g", str(plan.group_of_pictures), "-keyint_min", str(plan.group_of_pictures),
-            "-bf", "2",
+            *base[:-2],
+            "-vf",
+            vf_vaapi,
+            "-c:v",
+            "h264_vaapi",
+            "-profile:v",
+            "100",
+            "-qp",
+            str(plan.constant_rate_factor),
+            "-g",
+            str(plan.group_of_pictures),
+            "-keyint_min",
+            str(plan.group_of_pictures),
+            "-bf",
+            "2",
             *tail,
         ]
 
     if plan.encoder == "h264_qsv":
         return [
             *base,
-            "-c:v", "h264_qsv", "-profile:v", "high", "-pix_fmt", "yuv420p",
-            "-global_quality", str(plan.constant_rate_factor),
-            "-g", str(plan.group_of_pictures), "-keyint_min", str(plan.group_of_pictures),
+            "-c:v",
+            "h264_qsv",
+            "-profile:v",
+            "high",
+            "-pix_fmt",
+            "yuv420p",
+            "-global_quality",
+            str(plan.constant_rate_factor),
+            "-g",
+            str(plan.group_of_pictures),
+            "-keyint_min",
+            str(plan.group_of_pictures),
             *tail,
         ]
 
@@ -94,18 +124,41 @@ def _build_ffmpeg_command(plan: EncodePlan) -> list[str]:
         vt_quality = max(1, min(100, round((51 - plan.constant_rate_factor) * 100 / 51)))
         return [
             *base,
-            "-c:v", "h264_videotoolbox", "-profile:v", "high", "-pix_fmt", "yuv420p",
-            "-q:v", str(vt_quality),
-            "-g", str(plan.group_of_pictures), "-keyint_min", str(plan.group_of_pictures),
+            "-c:v",
+            "h264_videotoolbox",
+            "-profile:v",
+            "high",
+            "-pix_fmt",
+            "yuv420p",
+            "-q:v",
+            str(vt_quality),
+            "-g",
+            str(plan.group_of_pictures),
+            "-keyint_min",
+            str(plan.group_of_pictures),
             *tail,
         ]
 
     # libx264 (CPU fallback)
     return [
         *base,
-        "-c:v", "libx264", "-profile:v", "high", "-pix_fmt", "yuv420p",
-        "-crf", str(plan.constant_rate_factor), "-preset", plan.preset,
-        "-g", str(plan.group_of_pictures), "-keyint_min", str(plan.group_of_pictures),
-        "-x264-params", "scenecut=0:open-gop=0", "-bf", "2",
+        "-c:v",
+        "libx264",
+        "-profile:v",
+        "high",
+        "-pix_fmt",
+        "yuv420p",
+        "-crf",
+        str(plan.constant_rate_factor),
+        "-preset",
+        plan.preset,
+        "-g",
+        str(plan.group_of_pictures),
+        "-keyint_min",
+        str(plan.group_of_pictures),
+        "-x264-params",
+        "scenecut=0:open-gop=0",
+        "-bf",
+        "2",
         *tail,
     ]

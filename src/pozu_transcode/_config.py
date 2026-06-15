@@ -37,8 +37,8 @@ class AspectCanvas:
 # Default canvases (~0.13 MP each, even dims). Tune to your corpus.
 DEFAULT_CANVASES: list[AspectCanvas] = [
     AspectCanvas("square", 360, 360),  # 1.00
-    AspectCanvas("4x3", 416, 312),     # 1.33
-    AspectCanvas("16x9", 480, 270),    # 1.78
+    AspectCanvas("4x3", 416, 312),  # 1.33
+    AspectCanvas("16x9", 480, 270),  # 1.78
 ]
 
 
