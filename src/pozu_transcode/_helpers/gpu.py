@@ -29,6 +29,33 @@ _X264_TO_NVENC_PRESET: dict[str, str] = {
 }
 
 
+def _encoder_works(encoder: str) -> bool:
+    """Return True if *encoder* can encode at least one frame without error."""
+    try:
+        subprocess.run(
+            [
+                "ffmpeg",
+                "-f",
+                "lavfi",
+                "-i",
+                "color=s=16x16:r=1",
+                "-frames:v",
+                "1",
+                "-c:v",
+                encoder,
+                "-f",
+                "null",
+                "-",
+            ],
+            capture_output=True,
+            timeout=10,
+            check=True,
+        )
+        return True
+    except Exception:
+        return False
+
+
 @functools.lru_cache(maxsize=1)
 def _detect_hw_encoder() -> str:
     """Return the best available H.264 encoder name, preferring hardware."""
@@ -44,7 +71,7 @@ def _detect_hw_encoder() -> str:
         return "libx264"
 
     for encoder in _ENCODER_PRIORITY:
-        if encoder in available:
+        if encoder in available and _encoder_works(encoder):
             if encoder == "libx264":
                 _log.info("GPU encoder not found; using libx264 (CPU)")
             else:
