@@ -9,15 +9,15 @@ from .io import PathLike
 def _create_sample_video(
     path: PathLike,
     *,
-    width: int = 320,
-    height: int = 320,
+    width: int = 640,
+    height: int = 640,
     frames_per_second: int = 60,
     duration_seconds: float = 2.0,
     include_audio: bool = True,
 ) -> Path:
     """Create a small synthetic video at *path* using ffmpeg's ``testsrc2`` source.
 
-    Defaults to a 320×320 square frame at 60 fps with a 440 Hz sine-wave audio track,
+    Defaults to a 640×640 square frame at 60 fps with a 440 Hz sine-wave audio track,
     giving values that clearly map onto the square canvas and stand apart from typical
     production footage. Pass ``include_audio=False`` to omit the audio stream.
 
