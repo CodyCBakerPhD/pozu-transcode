@@ -1,7 +1,11 @@
 """Detect the best available H.264 hardware encoder via ffmpeg."""
 
 import functools
+import logging
 import subprocess
+
+_log = logging.getLogger(__name__)
+
 
 # Probe order: NVIDIA NVENC → AMD/Intel VAAPI → Intel Quick Sync → Apple VideoToolbox → CPU
 _ENCODER_PRIORITY = [
@@ -35,6 +39,10 @@ def _detect_hw_encoder() -> str:
 
     for encoder in _ENCODER_PRIORITY:
         if encoder in available:
+            if encoder == "libx264":
+                _log.info("GPU encoder not found; using libx264 (CPU)")
+            else:
+                _log.info("Using hardware encoder: %s", encoder)
             return encoder
     return "libx264"
 

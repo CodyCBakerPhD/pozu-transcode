@@ -3,10 +3,12 @@
 The ``pozu`` group nests ``transcode video``, ``transcode batch`` and ``survey``.
 """
 
+import logging
 from pathlib import Path
 
 import rich_click as click
 from rich.console import Console
+from rich.logging import RichHandler
 
 from . import _core
 from ._helpers import _aspect_histogram
@@ -17,6 +19,12 @@ click.rich_click.USE_RICH_MARKUP = True
 click.rich_click.SHOW_ARGUMENTS = True
 
 console = Console()
+
+logging.basicConfig(
+    level=logging.INFO,
+    format="%(message)s",
+    handlers=[RichHandler(console=console, show_path=False, show_time=False)],
+)
 
 
 # pozu
