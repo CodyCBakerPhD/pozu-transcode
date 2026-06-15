@@ -54,8 +54,22 @@ def _build_ffmpeg_command(plan: EncodePlan) -> list[str]:
         f"pad={plan.canvas_width}:{plan.canvas_height}:{plan.pad_x}:{plan.pad_y}:color=black,"
         f"setsar=1"
     )
-    gop = ["-g", str(plan.group_of_pictures), "-keyint_min", str(plan.group_of_pictures)]
-    tail = ["-fps_mode", "cfr", "-r", str(plan.frames_per_second), "-an", "-movflags", "+faststart", plan.out_path]
+    gop = [
+        "-g",
+        str(plan.group_of_pictures),
+        "-keyint_min",
+        str(plan.group_of_pictures),
+    ]
+    tail = [
+        "-fps_mode",
+        "cfr",
+        "-r",
+        str(plan.frames_per_second),
+        "-an",
+        "-movflags",
+        "+faststart",
+        plan.out_path,
+    ]
     crf = plan.constant_rate_factor
 
     if plan.encoder == "h264_nvenc":
@@ -78,11 +92,29 @@ def _build_ffmpeg_command(plan: EncodePlan) -> list[str]:
         vf = vf + ",format=nv12|vaapi,hwupload"
         enc = ["-c:v", "h264_vaapi", "-profile:v", "100", "-qp", str(crf), "-bf", "2"]
     elif plan.encoder == "h264_qsv":
-        enc = ["-c:v", "h264_qsv", "-profile:v", "high", "-pix_fmt", "yuv420p", "-global_quality", str(crf)]
+        enc = [
+            "-c:v",
+            "h264_qsv",
+            "-profile:v",
+            "high",
+            "-pix_fmt",
+            "yuv420p",
+            "-global_quality",
+            str(crf),
+        ]
     elif plan.encoder == "h264_videotoolbox":
         # VideoToolbox quality is 1-100 (100=best); invert CRF scale (0-51, lower=better).
         vt_quality = max(1, min(100, round((51 - crf) * 100 / 51)))
-        enc = ["-c:v", "h264_videotoolbox", "-profile:v", "high", "-pix_fmt", "yuv420p", "-q:v", str(vt_quality)]
+        enc = [
+            "-c:v",
+            "h264_videotoolbox",
+            "-profile:v",
+            "high",
+            "-pix_fmt",
+            "yuv420p",
+            "-q:v",
+            str(vt_quality),
+        ]
     else:  # libx264 (CPU fallback)
         enc = [
             "-c:v",
