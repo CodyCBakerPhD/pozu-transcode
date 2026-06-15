@@ -1,9 +1,10 @@
 """Private implementation helpers, split by theme.
 
-geometry: canvas selection + letterbox math
-probe:    ffprobe wrapper
-planning: probe/config to encode plan + ffmpeg command
-io:       filesystem discovery and manifest writing
+geometry:  canvas selection + letterbox math
+probe:     ffprobe wrapper
+planning:  probe/config to encode plan + ffmpeg command
+io:        filesystem discovery and manifest writing
+synthetic: synthetic test-video generation via ffmpeg lavfi
 
 Nothing here is part of the supported API.
 """
@@ -18,12 +19,14 @@ from .io import (
 )
 from .planning import _build_ffmpeg_command, _plan_encode
 from .probe import _probe
+from .synthetic import _create_sample_video
 
 __all__ = [
     "PathLike",
     "_aspect_histogram",
     "_build_ffmpeg_command",
     "_compute_letterbox",
+    "_create_sample_video",
     "_even",
     "_iter_videos",
     "_pick_canvas",
