@@ -79,15 +79,6 @@ def test_letterbox_downscale_letterboxes_wide_into_square() -> None:
     assert box.pad_y == (720 - box.active_height) // 2
 
 
-def test_letterbox_upscale_when_allowed() -> None:
-    box = _compute_letterbox(480, 480, 960, 540, allow_upscale=True)
-    # smallest dimension limits the uniform scale (540/480), upscaled
-    assert box.active_height == 540
-    assert box.active_width == _even(480 * (540 / 480))  # 540 -> 540
-    assert box.pad_y == 0
-    assert box.pad_x == (960 - box.active_width) // 2
-
-
 def test_letterbox_dims_always_even() -> None:
     box = _compute_letterbox(1001, 563, 832, 624)
     assert box.active_width % 2 == 0
@@ -153,6 +144,9 @@ def test_build_ffmpeg_command_contains_canonical_flags() -> None:
     assert "-keyint_min" in cmd
     assert "-profile:v" in cmd and cmd[cmd.index("-profile:v") + 1] == "high"
     assert "-pix_fmt" in cmd and cmd[cmd.index("-pix_fmt") + 1] == "yuv420p"
+    # audio is stripped entirely (no audio stream in the output)
+    assert "-an" in cmd
+    assert "-c:a" not in cmd
     # scale + pad filter present and correct
     assert f"scale={plan.active_width}:{plan.active_height}:flags=lanczos" in joined
     assert f"pad={plan.canvas_width}:{plan.canvas_height}:{plan.pad_x}:{plan.pad_y}:color=black" in joined

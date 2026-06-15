@@ -102,8 +102,6 @@ class EncodePlan:
         x264 constant rate factor.
     preset : str
         x264 encoding speed preset.
-    audio_bitrate : str
-        AAC audio encode bitrate (e.g. ``"128k"``).
     """
 
     src_path: str
@@ -121,7 +119,6 @@ class EncodePlan:
     group_of_pictures: int
     constant_rate_factor: int
     preset: str
-    audio_bitrate: str
 
 
 @dataclass

@@ -12,8 +12,6 @@ DEFAULT_CONSTANT_RATE_FACTOR: int = 20  # x264 quality knob (lower = better qual
 DEFAULT_PRESET: str = "slow"
 DEFAULT_GROUP_OF_PICTURES_IN_SECONDS: float = 1.0  # keyframe interval, in seconds
 DEFAULT_FRAMES_PER_SECOND: int = 30  # force constant frame rate (CFR); 0 keeps source rate
-DEFAULT_ALLOW_UPSCALE: bool = False
-DEFAULT_AUDIO_BITRATE: str = "128k"
 
 # Recognized input container extensions (case-insensitive).
 VIDEO_EXTENSIONS = (".mp4", ".mov", ".avi", ".mkv", ".webm", ".m4v")
@@ -62,11 +60,6 @@ class TranscodeConfig:
     frames_per_second : int
         Output frame rate for Constant Frame Rate (CFR) encoding; ``0`` keeps the
         source frame rate while still enforcing a constant frame rate.
-    allow_upscale : bool
-        When ``True``, inputs smaller than the chosen canvas are scaled up to
-        fill it; when ``False`` they are padded instead.
-    audio_bitrate : str
-        Advanced Audio Coding (AAC) encode bitrate (e.g. ``"128k"``).
     canvases : list of AspectCanvas
         Ordered list of candidate output canvases; each input video is assigned
         to the nearest canvas in log-aspect-ratio space.
@@ -76,8 +69,6 @@ class TranscodeConfig:
     preset: str = DEFAULT_PRESET
     group_of_pictures_in_seconds: float = DEFAULT_GROUP_OF_PICTURES_IN_SECONDS
     frames_per_second: int = DEFAULT_FRAMES_PER_SECOND
-    allow_upscale: bool = DEFAULT_ALLOW_UPSCALE
-    audio_bitrate: str = DEFAULT_AUDIO_BITRATE
     canvases: list[AspectCanvas] = field(default_factory=lambda: list(DEFAULT_CANVASES))
 
 
