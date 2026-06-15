@@ -27,6 +27,8 @@ The video filter chain is:
 scale=AW:AH:flags=lanczos,pad=W:H:PADX:PADY:color=black,setsar=1
 ```
 
+Scaling uses **Lanczos resampling** (`flags=lanczos`): each output pixel is a weighted average of a neighborhood of source pixels via a windowed-sinc kernel. Unlike a plain box/bilinear average, the kernel's negative side-lobes preserve edge sharpness and detail when shrinking (at the cost of slight ringing near hard edges) — a good trade for small frames sampled for labeling.
+
 ## Install
 
 Requires **`ffmpeg`** to be installed separately.
