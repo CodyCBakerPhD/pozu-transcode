@@ -32,16 +32,35 @@ Unlike a plain box/bilinear average, the kernel's negative side-lobes preserve e
 
 ## Install
 
-Requires **`ffmpeg`** to be installed separately.
+### Container (recommended)
+
+The published image **bundles `ffmpeg`**, so there is nothing to install separately. It is hosted on the GitHub Container Registry:
+
+```bash
+docker pull ghcr.io/codycbakerphd/pozu-transcode:dev
+```
+
+The image is a self-contained environment: `pozu`, `ffmpeg`, and `ffprobe` are all on the `PATH`. Mount the directory holding your videos and call `pozu` directly:
+
+```bash
+docker run --rm -v "$PWD:/data" -w /data ghcr.io/codycbakerphd/pozu-transcode:dev \
+  pozu transcode video input.mp4 output.mp4
+```
+
+Run it with no command to drop into an interactive shell inside the environment:
+
+```bash
+docker run --rm -it -v "$PWD:/data" -w /data ghcr.io/codycbakerphd/pozu-transcode:dev
+```
+
+### From source
 
 ```bash
 git clone https://github.com/CodyCBakerPhD/pozu-transcode
 pip install -e ./pozu-transcode
 ```
 
-Python 3.12+ is required.
-
-Check ffmpeg is visible:
+Python 3.12+ is required, and **`ffmpeg`** must be installed separately. Check it is visible:
 
 ```bash
 ffmpeg -version
