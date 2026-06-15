@@ -17,10 +17,14 @@ _ENCODER_PRIORITY = [
 ]
 
 _X264_TO_NVENC_PRESET: dict[str, str] = {
-    "ultrafast": "p1", "superfast": "p1",
-    "veryfast": "p2", "faster": "p3",
-    "fast": "p4", "medium": "p4",
-    "slow": "p5", "slower": "p6",
+    "ultrafast": "p1",
+    "superfast": "p1",
+    "veryfast": "p2",
+    "faster": "p3",
+    "fast": "p4",
+    "medium": "p4",
+    "slow": "p5",
+    "slower": "p6",
     "veryslow": "p7",
 }
 
@@ -31,7 +35,9 @@ def _detect_hw_encoder() -> str:
     try:
         result = subprocess.run(
             ["ffmpeg", "-encoders", "-v", "quiet"],
-            capture_output=True, text=True, timeout=10,
+            capture_output=True,
+            text=True,
+            timeout=10,
         )
         available = result.stdout
     except Exception:

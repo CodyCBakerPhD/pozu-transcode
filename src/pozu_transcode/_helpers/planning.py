@@ -44,7 +44,7 @@ def _plan_encode(
         group_of_pictures=group_of_pictures,
         constant_rate_factor=config.constant_rate_factor,
         preset=config.preset,
-        encoder=_detect_hw_encoder(),
+        encoder=config.encoder if config.encoder is not None else _detect_hw_encoder(),
     )
 
 

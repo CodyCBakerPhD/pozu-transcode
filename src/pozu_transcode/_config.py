@@ -63,6 +63,9 @@ class TranscodeConfig:
     canvases : list of AspectCanvas
         Ordered list of candidate output canvases; each input video is assigned
         to the nearest canvas in log-aspect-ratio space.
+    encoder : str or None
+        Force a specific FFmpeg H.264 encoder (e.g. ``"libx264"``, ``"h264_nvenc"``).
+        ``None`` auto-detects the best available encoder.
     """
 
     constant_rate_factor: int = DEFAULT_CONSTANT_RATE_FACTOR
@@ -70,6 +73,7 @@ class TranscodeConfig:
     group_of_pictures_in_seconds: float = DEFAULT_GROUP_OF_PICTURES_IN_SECONDS
     frames_per_second: int = DEFAULT_FRAMES_PER_SECOND
     canvases: list[AspectCanvas] = field(default_factory=lambda: list(DEFAULT_CANVASES))
+    encoder: str | None = None
 
 
 DEFAULT_CONFIG: TranscodeConfig = TranscodeConfig()
