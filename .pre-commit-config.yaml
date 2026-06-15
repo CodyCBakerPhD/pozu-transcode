@@ -1,7 +1,11 @@
-# Run `pre-commit install` once, then these run on every commit.
-# Run across everything with `pre-commit run --all-files`.
+ci:
+  autoupdate_schedule: quarterly
+
+default_install_hook_types:
+  - pre-commit
+
 default_language_version:
-  python: python3.12
+  python: python3.11
 
 repos:
   - repo: https://github.com/pre-commit/pre-commit-hooks
