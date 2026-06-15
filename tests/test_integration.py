@@ -7,6 +7,7 @@ They exercise the full encode pipeline end-to-end rather than mocking ffmpeg.
 from pathlib import Path
 
 import pytest
+from conftest import requires_ffmpeg
 
 from pozu_transcode import (
     AspectCanvas,
@@ -17,9 +18,6 @@ from pozu_transcode import (
     transcode_batch,
 )
 from pozu_transcode._helpers import _create_sample_video, _probe
-
-from conftest import requires_ffmpeg
-
 
 # ── fixture helpers ───────────────────────────────────────────────────────────
 
@@ -33,7 +31,9 @@ def video_640x480(sample_video: Path) -> Path:
 @pytest.fixture()
 def video_1920x1080(tmp_path: Path) -> Path:
     """1920×1080 synthetic source — falls into the 16×9 bucket."""
-    return _create_sample_video(tmp_path / "hd.mp4", width=1920, height=1080, frames_per_second=30, duration_seconds=1.0)
+    return _create_sample_video(
+        tmp_path / "hd.mp4", width=1920, height=1080, frames_per_second=30, duration_seconds=1.0
+    )
 
 
 @pytest.fixture()
