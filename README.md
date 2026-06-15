@@ -10,8 +10,8 @@ Every output is:
 - **H.264 High / yuv420p**, `-movflags +faststart` (moov atom at the front for fast streaming + seeking).
 - **Constant frame rate** (`-fps_mode cfr -r <fps>`, default of 30 Hz; `--fps 0` keeps the source rate but still forces CFR).
 - **Closed ~1s GoP (Group of Pictures)** for fast random-frame seeks without all-intra bloat: `-g`/`-keyint_min` ≈ `fps × gop_seconds`, `scenecut=0:open-gop=0`, `-bf 2`.
-- **`-crf 20`, `-preset slow`**, audio `aac @ 128k`.
-- **Aspect-ratio bucketed**: each video is assigned to the nearest canvas in log-aspect-ratio space, then **uniform-scaled + letterbox-padded** into that canvas (never stretched or cropped). Downscale-only by default (no upscaling small sources unless `--allow-upscale`).
+- **`-crf 20`, `-preset slow`**, audio stripped (`-an`) — the canonical space is video-only.
+- **Aspect-ratio bucketed**: each video is assigned to the nearest canvas in log-aspect-ratio space, then **uniform-scaled + letterbox-padded** into that canvas (never stretched or cropped). Downscale-only (small sources are padded, never upscaled).
 
 Default canvases (~0.13 megapixels each, even dims):
 

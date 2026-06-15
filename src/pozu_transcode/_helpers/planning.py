@@ -18,7 +18,7 @@ def _plan_encode(
     canvas = _pick_canvas(probe_result.aspect_ratio, config.canvases)
     box = _compute_letterbox(
         probe_result.width, probe_result.height,
-        canvas.width, canvas.height, config.allow_upscale,
+        canvas.width, canvas.height,
     )
     frames_per_second = (
         config.frames_per_second
@@ -43,7 +43,6 @@ def _plan_encode(
         group_of_pictures=group_of_pictures,
         constant_rate_factor=config.constant_rate_factor,
         preset=config.preset,
-        audio_bitrate=config.audio_bitrate,
     )
 
 
@@ -62,6 +61,6 @@ def _build_ffmpeg_command(plan: EncodePlan) -> list[str]:
         "-g", str(plan.group_of_pictures), "-keyint_min", str(plan.group_of_pictures),
         "-x264-params", "scenecut=0:open-gop=0", "-bf", "2",
         "-fps_mode", "cfr", "-r", str(plan.frames_per_second),
-        "-c:a", "aac", "-b:a", plan.audio_bitrate,
+        "-an",
         "-movflags", "+faststart", plan.out_path,
     ]

@@ -22,16 +22,12 @@ def _compute_letterbox(
     source_height: int,
     canvas_width: int,
     canvas_height: int,
-    allow_upscale: bool = False,
 ) -> Letterbox:
     """Uniform-scale ``src`` to fit inside the canvas, then center-pad.
 
-    Downscale-only unless ``allow_upscale`` — we never invent detail in sources
-    smaller than the canvas.
+    Downscale-only — we never invent detail in sources smaller than the canvas.
     """
-    scale = min(canvas_width / source_width, canvas_height / source_height)
-    if not allow_upscale:
-        scale = min(scale, 1.0)
+    scale = min(canvas_width / source_width, canvas_height / source_height, 1.0)
     active_width, active_height = _even(source_width * scale), _even(source_height * scale)
     return Letterbox(
         active_width,
