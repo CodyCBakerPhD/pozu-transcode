@@ -16,7 +16,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        python-version: ["3.12", "3.13"]
+        python-version: ["3.14"]
 
     steps:
       - uses: actions/checkout@v4
@@ -27,13 +27,11 @@ jobs:
           python-version: ${{ matrix.python-version }}
           cache: pip
 
-      # `--group` (PEP 735 dependency groups) needs a recent pip.
       - name: Upgrade pip
         run: python -m pip install --upgrade pip
 
       - name: Install package and test dependencies
         run: pip install -e . --group test
 
-      # The unit tests cover the framework-agnostic core and run without ffmpeg.
       - name: Run tests
         run: pytest -v
